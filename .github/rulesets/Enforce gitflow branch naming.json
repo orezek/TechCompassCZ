@@ -1,0 +1,29 @@
+{
+  "id": 6936757,
+  "name": "Enforce GitFlow Naming",
+  "target": "branch",
+  "source_type": "Repository",
+  "source": "LazyLab-io/monorepo_template",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "exclude": [
+        "refs/heads/main",
+        "refs/heads/develop",
+        "refs/heads/feature/*",
+        "refs/heads/hotfix/*",
+        "refs/heads/bugfix/*",
+        "refs/heads/release/v?[0-g]+\\.[0-9]+\\.[0-9]+"
+      ],
+      "include": [
+        "refs/heads/*"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "type": "creation"
+    }
+  ],
+  "bypass_actors": []
+}
