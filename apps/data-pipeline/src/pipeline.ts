@@ -22,8 +22,6 @@ import {
   enrichedJobSchema,
 } from "./schemas/enrichedJobsSchema.js";
 
-
-
 await connectToDb();
 const db = client.db("it-jobs");
 const staged_jobs = db.collection<StagedJobSchema>("staged-jobs");
@@ -99,11 +97,12 @@ async function fileExtractor() {
 
 async function enrichedJobsAdder() {
   const enrichedJobsArray: EnrichedJobSchema[] = [];
-  //await connectToDb();
+  await connectToDb();
   const enrichedJobs = db.collection<EnrichedJobSchema>("enriched-jobs");
   const query = {};
   const stagedJobs = staged_jobs.find(query);
   for await (const stagedJob of stagedJobs) {
+    // console.log(stagedJob);
     const result = enrichedJobSchema.safeParse(stagedJob);
     if (result.success) {
       const doc: EnrichedJobSchema | null = await enrichedJobs.findOne({
@@ -112,6 +111,9 @@ async function enrichedJobsAdder() {
       if (!doc) {
         enrichedJobsArray.push(result.data);
       }
+    }
+    else {
+      throw new Error(result.error.message);
     }
   }
   if (enrichedJobsArray.length > 0) {

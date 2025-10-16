@@ -1,4 +1,5 @@
 import { z } from "zod";
+import {pipelineMetadataSchema} from "./observabilitySchema.js";
 
 // Benefits part:
 const financialBenefitsSchema = z
@@ -199,9 +200,6 @@ export const benefitsSchema = z.object({
     .describe(
       "A list of any other benefits that do not fit into the predefined categories.",
     ),
-});
-
-benefitsSchema.extend({
   seniorityLevel: z
     .enum([
       "intern",
@@ -216,8 +214,9 @@ benefitsSchema.extend({
     .default(null)
     .describe(
       "The standardized seniority level deduced from the job description and requirements.",
-    ),
+    )
 });
+
 // Job Details Schema
 const jobDetailsSchema = z.object({
   company: z
@@ -516,7 +515,7 @@ export const jobDescriptionSchema = z.object({
 });
 
 // Main enriched jobs schema
-export const enrichedJobSchema = z.object({
+const enrichedJobSchemaPartial = z.object({
   _id: z
     .string()
     .nonempty()
@@ -654,3 +653,8 @@ export const enrichedJobSchema = z.object({
 });
 
 export type EnrichedJobSchema = z.infer<typeof enrichedJobSchema>;
+
+//
+export const enrichedJobSchema = enrichedJobSchemaPartial.extend({
+  _pipelineMetadata: pipelineMetadataSchema.nullable().default(null).describe("Metadata for observability processing."),
+});
