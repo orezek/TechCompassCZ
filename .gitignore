@@ -41,3 +41,6 @@ yarn-error.log*
 .idea
 .vscode
 .editorconfig
+
+**/tsconfig.tsbuildinfo
+tsconfig.tsbuildinfo
