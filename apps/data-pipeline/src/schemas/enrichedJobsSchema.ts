@@ -1,224 +1,8 @@
 import { z } from "zod";
-import {pipelineMetadataSchema} from "./observabilitySchema.js";
-
-// Benefits part:
-const financialBenefitsSchema = z
-  .object({
-    bonuses: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if performance bonuses or premiums are offered. Null if not mentioned.",
-      ),
-    meal_vouchers_or_allowance: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if meal vouchers or a food allowance is provided. Null if not mentioned.",
-      ),
-    pension_or_life_insurance_contribution: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if the company contributes to a pension or life insurance plan. Null if not mentioned.",
-      ),
-    employee_discounts: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if discounts on company products or services are available. Null if not mentioned.",
-      ),
-    favorable_employee_loans: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if the company offers favorable loans to employees. Null if not mentioned.",
-      ),
-    company_phone: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if a mobile phone is provided for personal and professional use. Null if not mentioned.",
-      ),
-    company_laptop: z
-      .boolean()
-      .nullable()
-      .describe("Indicates if a laptop is provided. Null if not mentioned."),
-  })
-  .describe(
-    "Benefits related to salary, bonuses, and financial contributions.",
-  );
-
-const flexibilityAndLeaveSchema = z
-  .object({
-    home_office_policy: z
-      .enum(["on-site", "occasional", "hybrid", "full_remote"])
-      .nullable()
-      .describe(
-        "Describes the company's work-from-home policy. Null if not mentioned.",
-      ),
-    flexible_hours: z
-      .object({
-        flex_start_end: z
-          .boolean()
-          .nullable()
-          .describe(
-            "Option for flexible start and end times for the workday. Null if not mentioned.",
-          ),
-        individual_schedule: z
-          .boolean()
-          .nullable()
-          .describe(
-            "Ability for employees to set their own work schedule. Null if not mentioned.",
-          ),
-        banked_hours: z
-          .boolean()
-          .nullable()
-          .describe(
-            "Option to work extra hours to take time off later. Null if not mentioned.",
-          ),
-      })
-      .nullable()
-      .describe("Options related to flexible working hours."),
-    vacation_policy: z
-      .string()
-      .nullable()
-      .describe(
-        'Describes the vacation allowance (e.g., "5 weeks", "more_than_5_weeks"). Null if not mentioned.',
-      ),
-    sick_days: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if dedicated sick days or health leave are provided. Null if not mentioned.",
-      ),
-    unpaid_leave_option: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if there is an option for extended unpaid leave. Null if not mentioned.",
-      ),
-  })
-  .describe("Benefits related to work schedule, location, and time off.");
-
-const professionalDevelopmentSchema = z
-  .object({
-    courses_and_training: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if the company provides educational courses and training. Null if not mentioned.",
-      ),
-    conference_attendance: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if the company supports participation in conferences, including international ones. Null if not mentioned.",
-      ),
-    study_leave: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if there is an option for paid or unpaid study leave. Null if not mentioned.",
-      ),
-    personal_growth_budget: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if an individual budget is provided for personal development. Null if not mentioned.",
-      ),
-    innovation_time: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if there is dedicated time for employees to work on innovative projects. Null if not mentioned.",
-      ),
-  })
-  .describe("Benefits related to employee growth and learning.");
-
-const officeAndCommunitySchema = z
-  .object({
-    refreshments_at_workplace: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if free refreshments (coffee, snacks, etc.) are available. Null if not mentioned.",
-      ),
-    corporate_events: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if the company organizes team-building and corporate events. Null if not mentioned.",
-      ),
-    dog_friendly: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if employees are allowed to bring dogs to the office. Null if not mentioned.",
-      ),
-    children_friendly: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if the office has facilities for children (e.g., a playroom). Null if not mentioned.",
-      ),
-    company_kindergarten: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if the company has its own kindergarten. Null if not mentioned.",
-      ),
-    work_clothes_provided: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates if work-specific clothing is provided. Null if not mentioned.",
-      ),
-  })
-  .describe("Perks related to the office environment and company culture.");
-
-const healthAndWellnessSchema = z
-  .object({
-    sport_culture_leisure_contribution: z
-      .boolean()
-      .nullable()
-      .describe(
-        "Indicates a contribution to activities like Multisport, gym, or cultural events. Null if not mentioned.",
-      ),
-  })
-  .describe("Benefits related to employee health and well-being.");
-
-export const benefitsSchema = z.object({
-  financial: financialBenefitsSchema.nullable(),
-  flexibility_and_leave: flexibilityAndLeaveSchema.nullable(),
-  professional_development: professionalDevelopmentSchema.nullable(),
-  office_and_community: officeAndCommunitySchema.nullable(),
-  health_and_wellness: healthAndWellnessSchema.nullable(),
-  other_benefits: z
-    .array(z.string())
-    .nullable()
-    .describe(
-      "A list of any other benefits that do not fit into the predefined categories.",
-    ),
-  seniorityLevel: z
-    .enum([
-      "intern",
-      "junior",
-      "medior",
-      "senior",
-      "lead",
-      "manager",
-      "executive",
-    ])
-    .nullable()
-    .default(null)
-    .describe(
-      "The standardized seniority level deduced from the job description and requirements.",
-    )
-});
+import { pipelineMetadataSchema } from "./observabilitySchema.js";
 
 // Job Details Schema
-const jobDetailsSchema = z.object({
+export const jobDetailsSchema = z.object({
   company: z
     .object({
       name: z
@@ -315,7 +99,7 @@ const jobDetailsSchema = z.object({
 });
 
 // Company Intro Schema
-const companyIntroSchema = z.object({
+export const companyIntroSchema = z.object({
   business_summary: z
     .string()
     .nullable()
@@ -485,6 +269,21 @@ export const jobDescriptionSchema = z.object({
         ),
     })
     .describe("The required technical and soft skills for the candidate."),
+  seniorityLevel: z
+    .enum([
+      "intern",
+      "junior",
+      "medior",
+      "senior",
+      "lead",
+      "manager",
+      "executive",
+    ])
+    .nullable()
+    .default(null)
+    .describe(
+      "The standardized seniority level deduced from the job description and requirements.",
+    ),
   candidateProfile: z
     .array(z.string())
     .describe(
@@ -515,7 +314,7 @@ export const jobDescriptionSchema = z.object({
 });
 
 // Main enriched jobs schema
-const enrichedJobSchemaPartial = z.object({
+const enrichedJobSchemaBase = z.object({
   _id: z
     .string()
     .nonempty()
@@ -584,10 +383,6 @@ const enrichedJobSchemaPartial = z.object({
     .describe(
       "Information extracted, deduced and discerned from job description.",
     ),
-  benefitsParsed: benefitsSchema
-    .nullable()
-    .default(null)
-    .describe("Extracted benefits schema into more semantic categories."),
   companyIntroParsed: companyIntroSchema
     .nullable()
     .default(null)
@@ -655,6 +450,9 @@ const enrichedJobSchemaPartial = z.object({
 export type EnrichedJobSchema = z.infer<typeof enrichedJobSchema>;
 
 //
-export const enrichedJobSchema = enrichedJobSchemaPartial.extend({
-  _pipelineMetadata: pipelineMetadataSchema.nullable().default(null).describe("Metadata for observability processing."),
+export const enrichedJobSchema = enrichedJobSchemaBase.extend({
+  _pipelineMetadata: pipelineMetadataSchema
+    .nullable()
+    .default(null)
+    .describe("Metadata for observability processing."),
 });

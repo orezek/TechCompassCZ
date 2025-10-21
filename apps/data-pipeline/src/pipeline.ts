@@ -3,9 +3,13 @@ import * as dotenv from "dotenv";
 import * as csv from "fast-csv";
 import path from "path";
 import fs from "fs";
-
-// import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-// import * as hub from "langchain/hub/node";
+import {
+  jobDescriptionSchema,
+  jobDetailsSchema,
+  companyIntroSchema,
+} from "./schemas/enrichedJobsSchema.js";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import * as hub from "langchain/hub/node";
 // import {testSchema} from "./schemas/testSchema.js";
 
 import { connectToDb, client } from "./mongoConnectionDb.js";
@@ -21,6 +25,12 @@ import {
   type EnrichedJobSchema,
   enrichedJobSchema,
 } from "./schemas/enrichedJobsSchema.js";
+import {
+  ChatPromptTemplate,
+  HumanMessagePromptTemplate,
+  PromptTemplate,
+  SystemMessagePromptTemplate,
+} from "@langchain/core/prompts";
 
 await connectToDb();
 const db = client.db("it-jobs");
@@ -77,23 +87,34 @@ async function fileExtractor() {
   });
 }
 
-// async function askGemini(jobDescription: string) {
-//   const prompt = await hub.pull("forensic-ad-analyzer");
-//
-//   const model = new ChatGoogleGenerativeAI({
-//     model: "gemini-2.5-flash-lite",
-//     temperature: 0,
-//   });
-//
-//   const chain = prompt.pipe(model);
-//
-//   const result = await chain.invoke({
-//     jobDescription: jobDescription,
-//   });
-//
-//   // console.log(result.content);
-//   return result;
-// }
+async function askGemini(jobDescription: string) {
+  const model = new ChatGoogleGenerativeAI({
+    model: "gemini-2.5-flash-lite",
+    temperature: 0,
+  });
+
+  // use benefitsSchema
+
+  // Test 1 - printing PromptValues
+  // const humanPrompt = PromptTemplate.fromTemplate(`What is the capital city of {country}.`);
+  // const systemPrompt = PromptTemplate.fromTemplate("You are a geography teacher.");
+  // const humMessage = new HumanMessagePromptTemplate({prompt: humanPrompt});
+  // const sysMessage = new SystemMessagePromptTemplate({prompt: systemPrompt});
+  // const finalMessages = ChatPromptTemplate.fromMessages([humMessage, sysMessage]);
+  // const finalPrompt = await finalMessages.invoke({country: "Poland"});
+  // console.log(finalPrompt.toChatMessages());
+  // return finalPrompt.toChatMessages();
+
+  // Test 2 calling model to generate the analysis
+  // const prompt = await hub.pull("forensic-ad-analyzer");
+  // const chain = prompt.pipe(model);
+  // const result = await chain.invoke({
+  //   jobDescription: jobDescription,
+  // });
+
+  // console.log(result.content);
+  // return result;
+}
 
 async function enrichedJobsAdder() {
   const enrichedJobsArray: EnrichedJobSchema[] = [];
@@ -111,8 +132,7 @@ async function enrichedJobsAdder() {
       if (!doc) {
         enrichedJobsArray.push(result.data);
       }
-    }
-    else {
+    } else {
       throw new Error(result.error.message);
     }
   }
@@ -140,6 +160,7 @@ async function enrichedJobsAdder() {
 // }
 
 try {
+  await askGemini("some text");
   await fileExtractor();
   console.log("The extraction ended!");
   //await client.close();
