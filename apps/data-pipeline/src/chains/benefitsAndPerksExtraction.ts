@@ -11,7 +11,7 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { corePositionDetailsSchema } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/corePositionDetails/corePositionDetailsSchema.js";
+import {benefitsAndPerksSchema} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/benefitsAndPerks/benefitsAndPerksSchema.js";
 import {
   humanMessageExample1,
   humanMessageExample2,
@@ -21,8 +21,8 @@ import {
   aiMessageExample1,
   aiMessageExample2,
   aiMessageExample3,
-} from "../fewShotExamples/aiMessage/corePositionDetails.js";
-import { corePositionDetailsSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/corePositionDetails/corePositionDetailsSystemMessage.js";
+} from "../fewShotExamples/aiMessage/benefitsAdnPerks.js"
+import { benefitsAndPerksSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/benefitsAndPerks/benefitsAndPerksSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -37,7 +37,7 @@ const model = new ChatGoogleGenerativeAI({
 });
 
 const systemMessage = PromptTemplate.fromTemplate(
-  corePositionDetailsSystemMessage,
+  benefitsAndPerksSystemMessage,
 );
 
 const humanMessage = PromptTemplate.fromTemplate("{placementText}");
@@ -60,17 +60,17 @@ const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
   ],
 });
 
-export async function extractCorePositionAndDetails(jobAd: string) {
+export async function extractBenefitsAndPerks(jobAd: string) {
   try {
     const extractCorePosition = await extractCorePositionAndDetailsPrompt
       .pipe(
-        model.withStructuredOutput(corePositionDetailsSchema, {
+        model.withStructuredOutput(benefitsAndPerksSchema, {
           name: "corePositionAndDetails",
         }),
       )
       .invoke({ placementText: jobAd, examples: examples });
     const validatedCorePositionDetails =
-      corePositionDetailsSchema.safeParse(extractCorePosition);
+      benefitsAndPerksSchema.safeParse(extractCorePosition);
     if (validatedCorePositionDetails.success) {
       return validatedCorePositionDetails.data;
     } else return null;

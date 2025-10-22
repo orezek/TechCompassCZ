@@ -1,5 +1,5 @@
 //Example 1 (Ad 1) HumanMessage: [See Ad 1 Text Above] AIMessage (JSON):
-export const aiMesageExample1 = {
+export const aiMessageExample1 = {
   paidVacationDays: 25,
   sickDays: false,
   mealAllowance: false,
