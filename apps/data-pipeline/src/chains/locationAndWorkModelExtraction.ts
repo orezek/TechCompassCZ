@@ -49,7 +49,7 @@ const examples = [
   new AIMessage(JSON.stringify(aiMessageExample3)),
 ];
 
-const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
+const extractLocationAndWorkModelPrompt = new ChatPromptTemplate({
   inputVariables: ["placementText", "examples"],
   promptMessages: [
     new SystemMessagePromptTemplate(systemMessage),
@@ -60,20 +60,20 @@ const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
 
 export async function extractLocationAndWorkModel(jobAd: string) {
   try {
-    const extractCorePosition = await extractCorePositionAndDetailsPrompt
+    const extractedLocationAndWorkModel = await extractLocationAndWorkModelPrompt
       .pipe(
         model.withStructuredOutput(locationAndWorkModelSchema, {
-          name: "compensationAndFinancials",
+          name: "locationAndWorkModel",
         }),
       )
       .invoke({ placementText: jobAd, examples: examples });
-    const validatedCorePositionDetails =
-      locationAndWorkModelSchema.safeParse(extractCorePosition);
-    if (validatedCorePositionDetails.success) {
-      return validatedCorePositionDetails.data;
+    const validatedLocationAndWorkModel =
+      locationAndWorkModelSchema.safeParse(extractedLocationAndWorkModel);
+    if (validatedLocationAndWorkModel.success) {
+      return validatedLocationAndWorkModel.data;
     } else return null;
   } catch (e) {
-    console.error("Failed to extract the CorePositionDetails.");
+    console.error("Failed to extract the LocationAndWorkModel.");
     throw e;
   }
 }

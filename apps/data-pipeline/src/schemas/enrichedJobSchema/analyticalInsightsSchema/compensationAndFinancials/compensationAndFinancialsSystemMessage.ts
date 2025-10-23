@@ -1,4 +1,4 @@
-export const compensationAndFinancialSystemMessage =
+export const compensationAndFinancialsSystemMessage =
   "Here is an appropriate system message for the provided `CompensationAndFinancialsSchema`:\n" +
   "\n" +
   "```\n" +

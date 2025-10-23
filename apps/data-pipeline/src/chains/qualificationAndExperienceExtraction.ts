@@ -49,7 +49,7 @@ const examples = [
   new AIMessage(JSON.stringify(aiMessageExample3)),
 ];
 
-const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
+const extractQualificationAndExperiencePrompt = new ChatPromptTemplate({
   inputVariables: ["placementText", "examples"],
   promptMessages: [
     new SystemMessagePromptTemplate(systemMessage),
@@ -60,20 +60,20 @@ const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
 
 export async function extractQualificationAndExperience(jobAd: string) {
   try {
-    const extractCorePosition = await extractCorePositionAndDetailsPrompt
+    const extractedQualificationAndExperience = await extractQualificationAndExperiencePrompt
       .pipe(
         model.withStructuredOutput(qualificationsAndExperienceSchema, {
-          name: "compensationAndFinancials",
+          name: "qualificationAndExperience",
         }),
       )
       .invoke({ placementText: jobAd, examples: examples });
-    const validatedCorePositionDetails =
-      qualificationsAndExperienceSchema.safeParse(extractCorePosition);
-    if (validatedCorePositionDetails.success) {
-      return validatedCorePositionDetails.data;
+    const validatedQualificationAndExperience =
+      qualificationsAndExperienceSchema.safeParse(extractedQualificationAndExperience);
+    if (validatedQualificationAndExperience.success) {
+      return validatedQualificationAndExperience.data;
     } else return null;
   } catch (e) {
-    console.error("Failed to extract the CorePositionDetails.");
+    console.error("Failed to extract the QualificationAndExperience.");
     throw e;
   }
 }

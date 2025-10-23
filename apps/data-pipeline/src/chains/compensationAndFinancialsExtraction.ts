@@ -23,7 +23,7 @@ import {
   aiMessageExample3,
 } from "../fewShotExamples/aiMessage/compensationAndFinancials.js";
 
-import { companyAndTeamContextSystemMessage} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/companyAndTeamContext/companyAndTeamContextSystemMessage.js";
+import {compensationAndFinancialsSystemMessage} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/compensationAndFinancials/compensationAndFinancialsSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -35,7 +35,7 @@ const model = new ChatGoogleGenerativeAI({
 });
 
 const systemMessage = PromptTemplate.fromTemplate(
-  companyAndTeamContextSystemMessage,
+  compensationAndFinancialsSystemMessage,
 );
 
 const humanMessage = PromptTemplate.fromTemplate("{placementText}");
@@ -49,7 +49,7 @@ const examples = [
   new AIMessage(JSON.stringify(aiMessageExample3)),
 ];
 
-const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
+const extractCompensationAndFinancialsPrompt = new ChatPromptTemplate({
   inputVariables: ["placementText", "examples"],
   promptMessages: [
     new SystemMessagePromptTemplate(systemMessage),
@@ -60,20 +60,20 @@ const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
 
 export async function extractCompensationAndFinancials(jobAd: string) {
   try {
-    const extractCorePosition = await extractCorePositionAndDetailsPrompt
+    const extractedCompensationAndFinancials = await extractCompensationAndFinancialsPrompt
       .pipe(
         model.withStructuredOutput(compensationAndFinancialsSchema, {
           name: "compensationAndFinancials",
         }),
       )
       .invoke({ placementText: jobAd, examples: examples });
-    const validatedCorePositionDetails =
-      compensationAndFinancialsSchema.safeParse(extractCorePosition);
-    if (validatedCorePositionDetails.success) {
-      return validatedCorePositionDetails.data;
+    const validatedCompensationAndFinancials =
+      compensationAndFinancialsSchema.safeParse(extractedCompensationAndFinancials);
+    if (validatedCompensationAndFinancials.success) {
+      return validatedCompensationAndFinancials.data;
     } else return null;
   } catch (e) {
-    console.error("Failed to extract the CorePositionDetails.");
+    console.error("Failed to extract the CompensationAndFinancials.");
     throw e;
   }
 }

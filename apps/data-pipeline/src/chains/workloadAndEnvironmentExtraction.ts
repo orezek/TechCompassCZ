@@ -49,7 +49,7 @@ const examples = [
   new AIMessage(JSON.stringify(aiMessageExample3)),
 ];
 
-const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
+const extractWorkloadAndEnvironmentContextPrompt = new ChatPromptTemplate({
   inputVariables: ["placementText", "examples"],
   promptMessages: [
     new SystemMessagePromptTemplate(systemMessage),
@@ -60,20 +60,20 @@ const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
 
 export async function extractWorkloadAndEnvironmentContext(jobAd: string) {
   try {
-    const extractCorePosition = await extractCorePositionAndDetailsPrompt
+    const extractedWorkloadAndEnvironmentContext = await extractWorkloadAndEnvironmentContextPrompt
       .pipe(
         model.withStructuredOutput(workloadAndEnvironmentContextSchema, {
           name: "workloadAndEnvironmentContext",
         }),
       )
       .invoke({ placementText: jobAd, examples: examples });
-    const validatedCorePositionDetails =
-      workloadAndEnvironmentContextSchema.safeParse(extractCorePosition);
-    if (validatedCorePositionDetails.success) {
-      return validatedCorePositionDetails.data;
+    const validatedWorkloadAndEnvironmentContext =
+      workloadAndEnvironmentContextSchema.safeParse(extractedWorkloadAndEnvironmentContext);
+    if (validatedWorkloadAndEnvironmentContext.success) {
+      return validatedWorkloadAndEnvironmentContext.data;
     } else return null;
   } catch (e) {
-    console.error("Failed to extract the CorePositionDetails.");
+    console.error("Failed to extract the WorkloadAndEnvironmentContext.");
     throw e;
   }
 }

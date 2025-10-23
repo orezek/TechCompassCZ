@@ -49,7 +49,7 @@ const examples = [
   new AIMessage(JSON.stringify(aiMessageExample3)),
 ];
 
-const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
+const extractCompanyAndTeamContextPrompt = new ChatPromptTemplate({
   inputVariables: ["placementText", "examples"],
   promptMessages: [
     new SystemMessagePromptTemplate(systemMessage),
@@ -60,20 +60,20 @@ const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
 
 export async function extractCompanyAndTeamContext(jobAd: string) {
   try {
-    const extractCorePosition = await extractCorePositionAndDetailsPrompt
+    const extractedCompanyAndTeamContext = await extractCompanyAndTeamContextPrompt
       .pipe(
         model.withStructuredOutput(companyAndTeamContextSchema, {
-          name: "corePositionAndDetails",
+          name: "companyAndTeamContext",
         }),
       )
       .invoke({ placementText: jobAd, examples: examples });
-    const validatedCorePositionDetails =
-      companyAndTeamContextSchema.safeParse(extractCorePosition);
-    if (validatedCorePositionDetails.success) {
-      return validatedCorePositionDetails.data;
+    const validatedCompanyAndTeamContext =
+      companyAndTeamContextSchema.safeParse(extractedCompanyAndTeamContext);
+    if (validatedCompanyAndTeamContext.success) {
+      return validatedCompanyAndTeamContext.data;
     } else return null;
   } catch (e) {
-    console.error("Failed to extract the CorePositionDetails.");
+    console.error("Failed to extract the CompanyAndTeamContext.");
     throw e;
   }
 }

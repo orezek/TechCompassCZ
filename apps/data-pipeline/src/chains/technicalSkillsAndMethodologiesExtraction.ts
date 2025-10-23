@@ -48,7 +48,7 @@ const examples = [
   new AIMessage(JSON.stringify(aiMessageExample3)),
 ];
 
-const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
+const extractTechnicalSkillsAndMethodologiesPrompt = new ChatPromptTemplate({
   inputVariables: ["placementText", "examples"],
   promptMessages: [
     new SystemMessagePromptTemplate(systemMessage),
@@ -59,20 +59,20 @@ const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
 
 export async function extractTechnicalSkillsAndMethodologies (jobAd: string) {
   try {
-    const extractCorePosition = await extractCorePositionAndDetailsPrompt
+    const extractedTechnicalSkillsAndMethodologies = await extractTechnicalSkillsAndMethodologiesPrompt
       .pipe(
         model.withStructuredOutput(technicalSkillsAndMethodologiesSchema, {
-          name: "corePositionAndDetails",
+          name: "technicalSkillsAndMethodologies",
         }),
       )
       .invoke({ placementText: jobAd, examples: examples });
-    const validatedCorePositionDetails =
-      technicalSkillsAndMethodologiesSchema.safeParse(extractCorePosition);
-    if (validatedCorePositionDetails.success) {
-      return validatedCorePositionDetails.data;
+    const validatedTechnicalSkillsAndMethodologies =
+      technicalSkillsAndMethodologiesSchema.safeParse(extractedTechnicalSkillsAndMethodologies);
+    if (validatedTechnicalSkillsAndMethodologies.success) {
+      return validatedTechnicalSkillsAndMethodologies.data;
     } else return null;
   } catch (e) {
-    console.error("Failed to extract the CorePositionDetails.");
+    console.error("Failed to extract the TechnicalSkillsAndMethodologies.");
     throw e;
   }
 }

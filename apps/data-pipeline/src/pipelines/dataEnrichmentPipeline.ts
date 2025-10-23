@@ -25,10 +25,10 @@ let bulkWriteOperations: AnyBulkWriteOperation<EnrichedJobRecordsSchema>[] = [];
 async function processStagedJobs() {
   const enrichedJobs = enrichedJobsCollection.find({});
   for await (const enrichedJob of enrichedJobs) {
-    // const extractedCorePosition = await extractCorePositionAndDetails(JSON.stringify(enrichedJob.originalAdData));
-    // const extractedTechnicalSkills = await extractTechnicalSkillsAndMethodologies(JSON.stringify(enrichedJob.originalAdData));
-    // const extractedBenefitsAndPerks = await extractBenefitsAndPerks(JSON.stringify(enrichedJob.originalAdData));
-    // const extractedCareerDevelopmentAndRecruitment = await extractCareerDevelopmentAndRecruitment(JSON.stringify(enrichedJob.originalAdData));
+    const extractedCorePosition = await extractCorePositionAndDetails(JSON.stringify(enrichedJob.originalAdData));
+    const extractedTechnicalSkills = await extractTechnicalSkillsAndMethodologies(JSON.stringify(enrichedJob.originalAdData));
+    const extractedBenefitsAndPerks = await extractBenefitsAndPerks(JSON.stringify(enrichedJob.originalAdData));
+    const extractedCareerDevelopmentAndRecruitment = await extractCareerDevelopmentAndRecruitment(JSON.stringify(enrichedJob.originalAdData));
     const extractedCompanyAndTeamContext = await extractCompanyAndTeamContext(JSON.stringify(enrichedJob.originalAdData));
     const extractedCompensationAndFinancials = await extractCompensationAndFinancials(JSON.stringify(enrichedJob.originalAdData));
     const extractedContractualDetails = await extractContractualDetails(JSON.stringify(enrichedJob.originalAdData));
@@ -42,10 +42,10 @@ async function processStagedJobs() {
         filter: {_id: enrichedJob._id},
         update: {
           $set: {
-            // "analyticalInsights.corePositionDetails": extractedCorePosition,
-            // "analyticalInsights.technicalSkillsAndMethodologies": extractedTechnicalSkills,
-            // "analyticalInsights.benefitsAndPerks": extractedBenefitsAndPerks,
-            // "analyticalInsights.careerDevelopmentAndRecruitment": extractedCareerDevelopmentAndRecruitment,
+            "analyticalInsights.corePositionDetails": extractedCorePosition,
+            "analyticalInsights.technicalSkillsAndMethodologies": extractedTechnicalSkills,
+            "analyticalInsights.benefitsAndPerks": extractedBenefitsAndPerks,
+            "analyticalInsights.careerDevelopmentAndRecruitment": extractedCareerDevelopmentAndRecruitment,
             "analyticalInsights.companyAndTeamContext": extractedCompanyAndTeamContext,
             "analyticalInsights.compensationAndFinancials": extractedCompensationAndFinancials,
             "analyticalInsights.contractulDetails": extractedContractualDetails,

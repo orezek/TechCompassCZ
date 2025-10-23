@@ -48,7 +48,7 @@ const examples = [
   new AIMessage(JSON.stringify(aiMessageExample3)),
 ];
 
-const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
+const extractCareerDevelopmentAndRecruitmentPrompt = new ChatPromptTemplate({
   inputVariables: ["placementText", "examples"],
   promptMessages: [
     new SystemMessagePromptTemplate(systemMessage),
@@ -59,20 +59,20 @@ const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
 
 export async function extractCareerDevelopmentAndRecruitment(jobAd: string) {
   try {
-    const extractCorePosition = await extractCorePositionAndDetailsPrompt
+    const extractedCareerDevelopmentAndRecruitment = await extractCareerDevelopmentAndRecruitmentPrompt
       .pipe(
         model.withStructuredOutput(careerDevelopmentAndRecruitmentInsightsSchema, {
-          name: "corePositionAndDetails",
+          name: "careerDevelopmentAndRecruitmentInsights",
         }),
       )
       .invoke({ placementText: jobAd, examples: examples });
-    const validatedCorePositionDetails =
-      careerDevelopmentAndRecruitmentInsightsSchema.safeParse(extractCorePosition);
-    if (validatedCorePositionDetails.success) {
-      return validatedCorePositionDetails.data;
+    const validatedCareerDevelopmentAndRecruitment =
+      careerDevelopmentAndRecruitmentInsightsSchema.safeParse(extractedCareerDevelopmentAndRecruitment);
+    if (validatedCareerDevelopmentAndRecruitment.success) {
+      return validatedCareerDevelopmentAndRecruitment.data;
     } else return null;
   } catch (e) {
-    console.error("Failed to extract the CorePositionDetails.");
+    console.error("Failed to extract the CareerDevelopmentAndRecruitment.");
     throw e;
   }
 }

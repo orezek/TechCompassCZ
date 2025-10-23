@@ -49,7 +49,7 @@ const examples = [
   new AIMessage(JSON.stringify(aiMessageExample3)),
 ];
 
-const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
+const extractCulturalAndPsychologicalIndicatorsPrompt = new ChatPromptTemplate({
   inputVariables: ["placementText", "examples"],
   promptMessages: [
     new SystemMessagePromptTemplate(systemMessage),
@@ -60,20 +60,20 @@ const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
 
 export async function extractCulturalAndPsychologicalIndicators(jobAd: string) {
   try {
-    const extractCorePosition = await extractCorePositionAndDetailsPrompt
+    const extractedCulturalAndPsychologicalIndicators = await extractCulturalAndPsychologicalIndicatorsPrompt
       .pipe(
         model.withStructuredOutput(culturalAndPsychologicalIndicatorsSchema, {
-          name: "compensationAndFinancials",
+          name: "culturalAndPsychologicalIndicators",
         }),
       )
       .invoke({ placementText: jobAd, examples: examples });
-    const validatedCorePositionDetails =
-      culturalAndPsychologicalIndicatorsSchema.safeParse(extractCorePosition);
-    if (validatedCorePositionDetails.success) {
-      return validatedCorePositionDetails.data;
+    const validatedCulturalAndPsychologicalIndicators =
+      culturalAndPsychologicalIndicatorsSchema.safeParse(extractedCulturalAndPsychologicalIndicators);
+    if (validatedCulturalAndPsychologicalIndicators.success) {
+      return validatedCulturalAndPsychologicalIndicators.data;
     } else return null;
   } catch (e) {
-    console.error("Failed to extract the CorePositionDetails.");
+    console.error("Failed to extract the CulturalAndPsychologicalIndicators.");
     throw e;
   }
 }
