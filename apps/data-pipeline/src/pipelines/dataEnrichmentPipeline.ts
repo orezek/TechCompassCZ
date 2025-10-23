@@ -13,30 +13,55 @@ import {extractCulturalAndPsychologicalIndicators} from "../chains/culturalAndPs
 import {extractLocationAndWorkModel} from "../chains/locationAndWorkModelExtraction.js";
 import {extractQualificationAndExperience} from "../chains/qualificationAndExperienceExtraction.js";
 import {extractWorkloadAndEnvironmentContext} from "../chains/workloadAndEnvironmentExtraction.js";
+
 dotenv.config();
 
 await connectToDb();
 const db = client.db('it-jobs');
 const enrichedJobsCollection = db.collection<EnrichedJobRecordsSchema>("enriched-job-records");
 
-const BATCH_SIZE = 3;
+const BATCH_SIZE = 100;
 let bulkWriteOperations: AnyBulkWriteOperation<EnrichedJobRecordsSchema>[] = [];
-
+let apiCounter = 0;
 async function processStagedJobs() {
   const enrichedJobs = enrichedJobsCollection.find({});
   for await (const enrichedJob of enrichedJobs) {
+    apiCounter++;
+    console.log(`Working on: ${enrichedJob.originalAdData?.jobTitle}`);
+    console.log("1");
     const extractedCorePosition = await extractCorePositionAndDetails(JSON.stringify(enrichedJob.originalAdData));
+    apiCounter++
+    console.log("2");
     const extractedTechnicalSkills = await extractTechnicalSkillsAndMethodologies(JSON.stringify(enrichedJob.originalAdData));
+    apiCounter++
+    console.log("3");
     const extractedBenefitsAndPerks = await extractBenefitsAndPerks(JSON.stringify(enrichedJob.originalAdData));
+    apiCounter++
+    console.log("4");
     const extractedCareerDevelopmentAndRecruitment = await extractCareerDevelopmentAndRecruitment(JSON.stringify(enrichedJob.originalAdData));
+    apiCounter++
+    console.log("5");
     const extractedCompanyAndTeamContext = await extractCompanyAndTeamContext(JSON.stringify(enrichedJob.originalAdData));
+    apiCounter++
+    console.log("6");
     const extractedCompensationAndFinancials = await extractCompensationAndFinancials(JSON.stringify(enrichedJob.originalAdData));
+    apiCounter++
+    console.log("7");
     const extractedContractualDetails = await extractContractualDetails(JSON.stringify(enrichedJob.originalAdData));
+    apiCounter++
+    console.log("8");
     const extractedCulturalAndPsychologicalIndicators = await extractCulturalAndPsychologicalIndicators(JSON.stringify(enrichedJob.originalAdData));
+    apiCounter++
+    console.log("9");
     const extractedLocationAndWorkModel = await extractLocationAndWorkModel(JSON.stringify(enrichedJob.originalAdData));
+    apiCounter++
+    console.log("10");
     const extractedQualificationAndExperience = await  extractQualificationAndExperience(JSON.stringify(enrichedJob.originalAdData));
+    apiCounter++
+    console.log("11");
     const extractedWorkloadAndEnvironmentContext = await extractWorkloadAndEnvironmentContext(JSON.stringify(enrichedJob.originalAdData));
-
+    apiCounter++
+    console.log("12");
     bulkWriteOperations.push({
       updateOne: {
         filter: {_id: enrichedJob._id},
@@ -84,3 +109,19 @@ finally {
 
 
 
+
+// For handling promises in parallel.
+// const geminiApiCalls = [
+//   extractCorePositionAndDetails(JSON.stringify(enrichedJob.originalAdData)),
+//   extractTechnicalSkillsAndMethodologies(JSON.stringify(enrichedJob.originalAdData)),
+//   extractBenefitsAndPerks(JSON.stringify(enrichedJob.originalAdData)),
+//   extractCareerDevelopmentAndRecruitment(JSON.stringify(enrichedJob.originalAdData)),
+//   extractCompanyAndTeamContext(JSON.stringify(enrichedJob.originalAdData)),
+//   extractCompensationAndFinancials(JSON.stringify(enrichedJob.originalAdData)),
+//   extractContractualDetails(JSON.stringify(enrichedJob.originalAdData)),
+//   extractCulturalAndPsychologicalIndicators(JSON.stringify(enrichedJob.originalAdData)),
+//   extractCulturalAndPsychologicalIndicators(JSON.stringify(enrichedJob.originalAdData)),
+//   extractLocationAndWorkModel(JSON.stringify(enrichedJob.originalAdData)),
+//   extractQualificationAndExperience(JSON.stringify(enrichedJob.originalAdData)),
+//   extractWorkloadAndEnvironmentContext(JSON.stringify(enrichedJob.originalAdData))
+// ];
