@@ -26,42 +26,52 @@ let apiCounter = 0;
 async function processStagedJobs() {
   const enrichedJobs = enrichedJobsCollection.find({});
   for await (const enrichedJob of enrichedJobs) {
-    apiCounter++;
     console.log(`Working on: ${enrichedJob.originalAdData?.jobTitle}`);
-    console.log("1");
+    console.log("Extracting core position and details");
     const extractedCorePosition = await extractCorePositionAndDetails(JSON.stringify(enrichedJob.originalAdData));
     apiCounter++
-    console.log("2");
+    console.log(`API call count: ${apiCounter}`);
+    console.log("Extracting technical skills and methodologies");
     const extractedTechnicalSkills = await extractTechnicalSkillsAndMethodologies(JSON.stringify(enrichedJob.originalAdData));
     apiCounter++
-    console.log("3");
+    console.log(`API call count: ${apiCounter}`);
+    console.log("Extracting benefits and perks");
     const extractedBenefitsAndPerks = await extractBenefitsAndPerks(JSON.stringify(enrichedJob.originalAdData));
     apiCounter++
-    console.log("4");
+    console.log(`API call count: ${apiCounter}`);
+    console.log("Extracting career development and recruitment");
     const extractedCareerDevelopmentAndRecruitment = await extractCareerDevelopmentAndRecruitment(JSON.stringify(enrichedJob.originalAdData));
     apiCounter++
-    console.log("5");
+    console.log(`API call count: ${apiCounter}`);
+    console.log("Extracting company and team context");
     const extractedCompanyAndTeamContext = await extractCompanyAndTeamContext(JSON.stringify(enrichedJob.originalAdData));
     apiCounter++
-    console.log("6");
+    console.log(`API call count: ${apiCounter}`);
+    console.log("Extracting compensation and financials");
     const extractedCompensationAndFinancials = await extractCompensationAndFinancials(JSON.stringify(enrichedJob.originalAdData));
     apiCounter++
-    console.log("7");
+    console.log(`API call count: ${apiCounter}`);
+    console.log("Extracting contractual details");
     const extractedContractualDetails = await extractContractualDetails(JSON.stringify(enrichedJob.originalAdData));
     apiCounter++
-    console.log("8");
+    console.log(`API call count: ${apiCounter}`);
+    console.log("Extracting cultural and psychological indicators");
     const extractedCulturalAndPsychologicalIndicators = await extractCulturalAndPsychologicalIndicators(JSON.stringify(enrichedJob.originalAdData));
     apiCounter++
-    console.log("9");
+    console.log(`API call count: ${apiCounter}`);
+    console.log("Extracting location and work model");
     const extractedLocationAndWorkModel = await extractLocationAndWorkModel(JSON.stringify(enrichedJob.originalAdData));
     apiCounter++
-    console.log("10");
+    console.log(`API call count: ${apiCounter}`);
+    console.log("Extracting qualification and experience");
     const extractedQualificationAndExperience = await  extractQualificationAndExperience(JSON.stringify(enrichedJob.originalAdData));
     apiCounter++
-    console.log("11");
+    console.log(`API call count: ${apiCounter}`);
+    console.log("Extracting workload and environment context");
     const extractedWorkloadAndEnvironmentContext = await extractWorkloadAndEnvironmentContext(JSON.stringify(enrichedJob.originalAdData));
     apiCounter++
-    console.log("12");
+    console.log(`API call count: ${apiCounter}`);
+    console.log(`All data extracted for job: ${enrichedJob.originalAdData?.jobTitle}`);
     bulkWriteOperations.push({
       updateOne: {
         filter: {_id: enrichedJob._id},
@@ -106,7 +116,38 @@ finally {
   await client.close()
 }
 
+// Things to Change use array to Promise.all()
 
+// Test one big prompt with all the extraction task at once.
+
+
+// Example:
+
+//const [
+//             extractedCorePosition,
+//             extractedTechnicalSkills,
+//             extractedBenefitsAndPerks,
+//             extractedCareerDevelopmentAndRecruitment,
+//             extractedCompanyAndTeamContext,
+//             extractedCompensationAndFinancials,
+//             extractedContractualDetails,
+//             extractedCulturalAndPsychologicalIndicators,
+//             extractedLocationAndWorkModel,
+//             extractedQualificationAndExperience,
+//             extractedWorkloadAndEnvironmentContext
+//         ] = await Promise.all([
+//             extractCorePositionAndDetails(jobData),
+//             extractTechnicalSkillsAndMethodologies(jobData),
+//             extractBenefitsAndPerks(jobData),
+//             extractCareerDevelopmentAndRecruitment(jobData),
+//             extractCompanyAndTeamContext(jobData),
+//             extractCompensationAnd financials(jobData),
+//             extractContractualDetails(jobData),
+//             extractCulturalAndPsychologicalIndicators(jobData),
+//             extractLocationAndWorkModel(jobData),
+//             extractQualificationAndExperience(jobData),
+//             extractWorkloadAndEnvironmentContext(jobData)
+//         ]);
 
 
 
