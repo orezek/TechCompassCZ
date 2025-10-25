@@ -56,6 +56,7 @@ const chatChain = chatPrompt.pipe(model).pipe(jsonOutputParser);
 const countries = ["Russia", "North Korea", "India", "Canada"];
 
 async function longestRiverPerCountry(country: string) {
+  console.log(`The name of the running function: ${"longestRiverPerCountry"}`);
   return await chatChain.invoke({ countryName: country });
 }
 

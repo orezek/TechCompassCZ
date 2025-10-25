@@ -68,6 +68,7 @@ export async function extractQualificationAndExperience(jobAd: string) {
           }),
         )
         .invoke({ placementText: jobAd, examples: examples });
+    console.log(`The name of the running function: ${"extractQualificationAndExperience"}`);
     const validatedQualificationAndExperience =
       qualificationsAndExperienceSchema.safeParse(
         extractedQualificationAndExperience,

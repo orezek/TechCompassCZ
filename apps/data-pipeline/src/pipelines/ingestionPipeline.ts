@@ -6,7 +6,7 @@ import fs from "fs";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import * as hub from "langchain/hub/node";
 import type { AnyBulkWriteOperation } from "mongodb";
-import { connectToDb, client } from "../mongoConnectionDb.js";
+import { connectToLocalMongo, connectToCloudMongo, localClient, cloudClient } from "../mongoConnectionDb.js";
 // Load env vars to node.js engine
 dotenv.config();
 
@@ -29,9 +29,14 @@ import {
 } from "@langchain/core/prompts";
 import { originalAdSchema } from "../schemas/enrichedJobSchema/originalJobAdSchema/originalAdSchema.js";
 
-await connectToDb();
-const db = client.db("it-jobs");
+await connectToLocalMongo();
+const db = localClient.db("it-jobs");
 const staged_jobs = db.collection<StagedJobSchema>("staged-job-records");
+
+await connectToCloudMongo();
+const cloudDb = cloudClient.db('it-jobs');
+const cloud_staged_jobs = cloudDb.collection<StagedJobSchema>("staged-job-records");
+const cloud_enriched_jobs = cloudDb.collection<EnrichedJobRecordsSchema>("enriched-job-records");
 
 async function fileExtractor() {
   let counter = 0;
@@ -76,6 +81,7 @@ async function fileExtractor() {
         await Promise.all(dbCheckPromises);
         if (results.length > 0) {
           await staged_jobs.insertMany(results);
+          await cloud_staged_jobs.insertMany(results);
         }
         console.log(`Parsed csv rows: ${rowCount}.`);
         console.log(`Inserted new objects: ${results.length}.`);
@@ -115,7 +121,7 @@ async function askGemini(jobDescription: string) {
 
 async function enrichedJobsAdder() {
   const operations: AnyBulkWriteOperation<EnrichedJobRecordsSchema>[] = [];
-  await connectToDb();
+  await connectToLocalMongo();
   const enrichedJobs = db.collection<EnrichedJobRecordsSchema>(
     "enriched-job-records",
   );
@@ -149,6 +155,7 @@ async function enrichedJobsAdder() {
   if (operations.length > 0) {
     console.log(`Sending ${operations.length} operations to the database...`);
     const bulkResult = await enrichedJobs.bulkWrite(operations);
+    await cloud_enriched_jobs.bulkWrite(operations);
     // bulkResult gives you a detailed report
     console.log(`Enriched jobs summary:`);
     console.log(`  - ${bulkResult.insertedCount} new jobs inserted.`);
@@ -158,7 +165,7 @@ async function enrichedJobsAdder() {
   } else {
     console.log("No valid jobs to process.");
   }
-  await client.close();
+  await localClient.close();
   console.log("The DB has been closed");
 }
 
@@ -192,5 +199,5 @@ try {
 } catch (error) {
   console.log(error);
 } finally {
-  await client.close();
+  await localClient.close();
 }

@@ -1,13 +1,13 @@
 import { geminiFlashLite } from '../models/geminiModels.js';
 import * as hub from 'langchain/hub/node';
-import {connectToDb} from "../mongoConnectionDb.js";
-import {client} from "../mongoConnectionDb.js";
+import {connectToLocalMongo} from "../mongoConnectionDb.js";
+import {localClient} from "../mongoConnectionDb.js";
 import type {EnrichedJobRecordsSchema} from "../schemas/enrichedJobSchema/enrichedJobSchema.js";
 import type {AnyBulkWriteOperation} from "mongodb";
 import { searchVectorStringBuilder } from "../utils/searchVectorStringBuilder.js";
 
-await connectToDb();
-const collection = client.db("it-jobs").collection<EnrichedJobRecordsSchema>("enriched-job-records");
+await connectToLocalMongo();
+const collection = localClient.db("it-jobs").collection<EnrichedJobRecordsSchema>("enriched-job-records");
 
 
 
@@ -90,4 +90,4 @@ console.log("Writing to DB finished.");
 
 
 
-await client.close();
+await localClient.close();

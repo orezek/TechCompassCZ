@@ -68,6 +68,7 @@ export async function extractWorkloadAndEnvironmentContext(jobAd: string) {
           }),
         )
         .invoke({ placementText: jobAd, examples: examples });
+    console.log(`The name of the running function: ${"extractWorkloadAndEnvironmentContext"}`);
     const validatedWorkloadAndEnvironmentContext =
       workloadAndEnvironmentContextSchema.safeParse(
         extractedWorkloadAndEnvironmentContext,

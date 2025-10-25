@@ -30,7 +30,7 @@ const GEM_MODELS_FLASH = "gemini-2.5-flash";
 const GEM_MODELS_PRO = "gemini-2.5-pro";
 
 const model = new ChatGoogleGenerativeAI({
-  model: GEM_MODELS_FLASH_LITE,
+  model: GEM_MODELS_FLASH,
   temperature: 0,
 });
 
@@ -68,6 +68,7 @@ export async function extractLocationAndWorkModel(jobAd: string) {
           }),
         )
         .invoke({ placementText: jobAd, examples: examples });
+    console.log(`The name of the running function: ${"extractLocationAndWorkModel"}`);
     const validatedLocationAndWorkModel = locationAndWorkModelSchema.safeParse(
       extractedLocationAndWorkModel,
     );

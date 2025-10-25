@@ -70,6 +70,7 @@ export async function extractCareerDevelopmentAndRecruitment(jobAd: string) {
           ),
         )
         .invoke({ placementText: jobAd, examples: examples });
+    console.log(`The name of the running function: ${"extractCareerDevelopmentAndRecruitment"}`);
     const validatedCareerDevelopmentAndRecruitment =
       careerDevelopmentAndRecruitmentInsightsSchema.safeParse(
         extractedCareerDevelopmentAndRecruitment,

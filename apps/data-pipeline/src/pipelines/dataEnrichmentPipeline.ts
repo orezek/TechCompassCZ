@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-import { connectToDb, client } from "../mongoConnectionDb.js";
+import { connectToLocalMongo, localClient } from "../mongoConnectionDb.js";
 import { type EnrichedJobRecordsSchema } from "../schemas/enrichedJobSchema/enrichedJobSchema.js";
 import { extractTechnicalSkillsAndMethodologies } from "../chains/technicalSkillsAndMethodologiesExtraction.js";
 import { extractCorePositionAndDetails } from "../chains/corePositionDetailsExtraction.js";
@@ -16,8 +16,8 @@ import { extractWorkloadAndEnvironmentContext } from "../chains/workloadAndEnvir
 
 dotenv.config();
 
-await connectToDb();
-const db = client.db("it-jobs");
+await connectToLocalMongo();
+const db = localClient.db("it-jobs");
 const enrichedJobsCollection = db.collection<EnrichedJobRecordsSchema>(
   "enriched-job-records",
 );
@@ -29,6 +29,7 @@ async function processStagedJobs() {
   const enrichedJobs = enrichedJobsCollection.find({});
   for await (const enrichedJob of enrichedJobs) {
     console.log(`Working on: ${enrichedJob.originalAdData?.jobTitle}`);
+    console.log(`Working on: ${enrichedJob.originalAdData}`);
     const [
       extractedCorePosition,
       extractedTechnicalSkills,
@@ -107,7 +108,7 @@ try {
 } catch (e) {
   console.error(e);
 } finally {
-  await client.close();
+  await localClient.close();
 }
 
 // Things to Change use array to Promise.all()

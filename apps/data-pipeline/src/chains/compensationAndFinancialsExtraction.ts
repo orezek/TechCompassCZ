@@ -60,7 +60,6 @@ const extractCompensationAndFinancialsPrompt = new ChatPromptTemplate({
 
 export async function extractCompensationAndFinancials(jobAd: string) {
   try {
-    console.log(`The name of the running function: ${"extractedCompensationAndFinancials"}`);
     const extractedCompensationAndFinancials =
       await extractCompensationAndFinancialsPrompt
         .pipe(
@@ -69,6 +68,7 @@ export async function extractCompensationAndFinancials(jobAd: string) {
           }),
         )
         .invoke({ placementText: jobAd, examples: examples });
+    console.log(`The name of the running function: ${"extractedCompensationAndFinancials"}`);
     const validatedCompensationAndFinancials =
       compensationAndFinancialsSchema.safeParse(
         extractedCompensationAndFinancials,

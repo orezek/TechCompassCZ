@@ -67,6 +67,7 @@ export async function extractBenefitsAndPerks(jobAd: string) {
         }),
       )
       .invoke({ placementText: jobAd, examples: examples });
+    console.log(`The name of the running function: ${"extractBenefitsAndPerks"}`);
     const validatedBenefitsAndPerks = benefitsAndPerksSchema.safeParse(
       extractedBenefitsAndPerks,
     );

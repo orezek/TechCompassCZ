@@ -68,6 +68,7 @@ export async function extractCulturalAndPsychologicalIndicators(jobAd: string) {
           }),
         )
         .invoke({ placementText: jobAd, examples: examples });
+    console.log(`The name of the running function: ${"extractCulturalAndPsychologicalIndicators"}`);
     const validatedCulturalAndPsychologicalIndicators =
       culturalAndPsychologicalIndicatorsSchema.safeParse(
         extractedCulturalAndPsychologicalIndicators,
