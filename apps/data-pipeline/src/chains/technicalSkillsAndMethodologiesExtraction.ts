@@ -11,7 +11,7 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { technicalSkillsAndMethodologiesSchema} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/technicalSkillsAndMethodologies/technicalSkillAndMethodologiesSchema.js";
+import { technicalSkillsAndMethodologiesSchema } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/technicalSkillsAndMethodologies/technicalSkillAndMethodologiesSchema.js";
 import {
   humanMessageExample1,
   humanMessageExample2,
@@ -22,7 +22,7 @@ import {
   aiMessageExample2,
   aiMessageExample3,
 } from "../fewShotExamples/aiMessage/technicalSkillsAndMethodologies.js";
-import {technicalSkillsAndMethodologiesSystemMessage} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/technicalSkillsAndMethodologies/technicalSkillsAndMethodologiesSystemMessage.js";
+import { technicalSkillsAndMethodologiesSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/technicalSkillsAndMethodologies/technicalSkillsAndMethodologiesSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -57,17 +57,20 @@ const extractTechnicalSkillsAndMethodologiesPrompt = new ChatPromptTemplate({
   ],
 });
 
-export async function extractTechnicalSkillsAndMethodologies (jobAd: string) {
+export async function extractTechnicalSkillsAndMethodologies(jobAd: string) {
   try {
-    const extractedTechnicalSkillsAndMethodologies = await extractTechnicalSkillsAndMethodologiesPrompt
-      .pipe(
-        model.withStructuredOutput(technicalSkillsAndMethodologiesSchema, {
-          name: "technicalSkillsAndMethodologies",
-        }),
-      )
-      .invoke({ placementText: jobAd, examples: examples });
+    const extractedTechnicalSkillsAndMethodologies =
+      await extractTechnicalSkillsAndMethodologiesPrompt
+        .pipe(
+          model.withStructuredOutput(technicalSkillsAndMethodologiesSchema, {
+            name: "technicalSkillsAndMethodologies",
+          }),
+        )
+        .invoke({ placementText: jobAd, examples: examples });
     const validatedTechnicalSkillsAndMethodologies =
-      technicalSkillsAndMethodologiesSchema.safeParse(extractedTechnicalSkillsAndMethodologies);
+      technicalSkillsAndMethodologiesSchema.safeParse(
+        extractedTechnicalSkillsAndMethodologies,
+      );
     if (validatedTechnicalSkillsAndMethodologies.success) {
       return validatedTechnicalSkillsAndMethodologies.data;
     } else return null;

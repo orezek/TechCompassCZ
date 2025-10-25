@@ -22,7 +22,7 @@ import {
   aiMessageExample2,
   aiMessageExample3,
 } from "../fewShotExamples/aiMessage/careerDevelopmentAndRecruitmentInsights.js";
-import {careerDevelopmentAndRecruitmentInsightsSystemMessage} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/careerDevelopmentAndRecruitmentInsights/careerDevelopmentAndRecruitmentInsightsSystemMessage.js";
+import { careerDevelopmentAndRecruitmentInsightsSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/careerDevelopmentAndRecruitmentInsights/careerDevelopmentAndRecruitmentInsightsSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -59,15 +59,21 @@ const extractCareerDevelopmentAndRecruitmentPrompt = new ChatPromptTemplate({
 
 export async function extractCareerDevelopmentAndRecruitment(jobAd: string) {
   try {
-    const extractedCareerDevelopmentAndRecruitment = await extractCareerDevelopmentAndRecruitmentPrompt
-      .pipe(
-        model.withStructuredOutput(careerDevelopmentAndRecruitmentInsightsSchema, {
-          name: "careerDevelopmentAndRecruitmentInsights",
-        }),
-      )
-      .invoke({ placementText: jobAd, examples: examples });
+    const extractedCareerDevelopmentAndRecruitment =
+      await extractCareerDevelopmentAndRecruitmentPrompt
+        .pipe(
+          model.withStructuredOutput(
+            careerDevelopmentAndRecruitmentInsightsSchema,
+            {
+              name: "careerDevelopmentAndRecruitmentInsights",
+            },
+          ),
+        )
+        .invoke({ placementText: jobAd, examples: examples });
     const validatedCareerDevelopmentAndRecruitment =
-      careerDevelopmentAndRecruitmentInsightsSchema.safeParse(extractedCareerDevelopmentAndRecruitment);
+      careerDevelopmentAndRecruitmentInsightsSchema.safeParse(
+        extractedCareerDevelopmentAndRecruitment,
+      );
     if (validatedCareerDevelopmentAndRecruitment.success) {
       return validatedCareerDevelopmentAndRecruitment.data;
     } else return null;

@@ -11,7 +11,7 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import {workloadAndEnvironmentContextSchema} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/workloadAndEnvironmentContext/workloadAndEnvironmentContextSchema.js";
+import { workloadAndEnvironmentContextSchema } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/workloadAndEnvironmentContext/workloadAndEnvironmentContextSchema.js";
 import {
   humanMessageExample1,
   humanMessageExample2,
@@ -60,15 +60,18 @@ const extractWorkloadAndEnvironmentContextPrompt = new ChatPromptTemplate({
 
 export async function extractWorkloadAndEnvironmentContext(jobAd: string) {
   try {
-    const extractedWorkloadAndEnvironmentContext = await extractWorkloadAndEnvironmentContextPrompt
-      .pipe(
-        model.withStructuredOutput(workloadAndEnvironmentContextSchema, {
-          name: "workloadAndEnvironmentContext",
-        }),
-      )
-      .invoke({ placementText: jobAd, examples: examples });
+    const extractedWorkloadAndEnvironmentContext =
+      await extractWorkloadAndEnvironmentContextPrompt
+        .pipe(
+          model.withStructuredOutput(workloadAndEnvironmentContextSchema, {
+            name: "workloadAndEnvironmentContext",
+          }),
+        )
+        .invoke({ placementText: jobAd, examples: examples });
     const validatedWorkloadAndEnvironmentContext =
-      workloadAndEnvironmentContextSchema.safeParse(extractedWorkloadAndEnvironmentContext);
+      workloadAndEnvironmentContextSchema.safeParse(
+        extractedWorkloadAndEnvironmentContext,
+      );
     if (validatedWorkloadAndEnvironmentContext.success) {
       return validatedWorkloadAndEnvironmentContext.data;
     } else return null;

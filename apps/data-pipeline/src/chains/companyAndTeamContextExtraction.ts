@@ -23,7 +23,7 @@ import {
   aiMessageExample3,
 } from "../fewShotExamples/aiMessage/companyAndTeamContext.js";
 
-import { companyAndTeamContextSystemMessage} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/companyAndTeamContext/companyAndTeamContextSystemMessage.js";
+import { companyAndTeamContextSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/companyAndTeamContext/companyAndTeamContextSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -60,13 +60,14 @@ const extractCompanyAndTeamContextPrompt = new ChatPromptTemplate({
 
 export async function extractCompanyAndTeamContext(jobAd: string) {
   try {
-    const extractedCompanyAndTeamContext = await extractCompanyAndTeamContextPrompt
-      .pipe(
-        model.withStructuredOutput(companyAndTeamContextSchema, {
-          name: "companyAndTeamContext",
-        }),
-      )
-      .invoke({ placementText: jobAd, examples: examples });
+    const extractedCompanyAndTeamContext =
+      await extractCompanyAndTeamContextPrompt
+        .pipe(
+          model.withStructuredOutput(companyAndTeamContextSchema, {
+            name: "companyAndTeamContext",
+          }),
+        )
+        .invoke({ placementText: jobAd, examples: examples });
     const validatedCompanyAndTeamContext =
       companyAndTeamContextSchema.safeParse(extractedCompanyAndTeamContext);
     if (validatedCompanyAndTeamContext.success) {

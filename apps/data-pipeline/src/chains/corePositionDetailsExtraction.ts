@@ -59,15 +59,17 @@ const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
 
 export async function extractCorePositionAndDetails(jobAd: string) {
   try {
-    const extractedCorePositionDetails = await extractCorePositionAndDetailsPrompt
-      .pipe(
-        model.withStructuredOutput(corePositionDetailsSchema, {
-          name: "corePositionAndDetails",
-        }),
-      )
-      .invoke({ placementText: jobAd, examples: examples });
-    const validatedCorePositionDetails =
-      corePositionDetailsSchema.safeParse(extractedCorePositionDetails);
+    const extractedCorePositionDetails =
+      await extractCorePositionAndDetailsPrompt
+        .pipe(
+          model.withStructuredOutput(corePositionDetailsSchema, {
+            name: "corePositionAndDetails",
+          }),
+        )
+        .invoke({ placementText: jobAd, examples: examples });
+    const validatedCorePositionDetails = corePositionDetailsSchema.safeParse(
+      extractedCorePositionDetails,
+    );
     if (validatedCorePositionDetails.success) {
       return validatedCorePositionDetails.data;
     } else return null;

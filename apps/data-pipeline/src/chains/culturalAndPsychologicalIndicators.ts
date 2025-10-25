@@ -11,7 +11,7 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { culturalAndPsychologicalIndicatorsSchema} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/culturalAndPsychologicalIndicators/culturalAndPsychologicalIndicatorsSchema.js";
+import { culturalAndPsychologicalIndicatorsSchema } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/culturalAndPsychologicalIndicators/culturalAndPsychologicalIndicatorsSchema.js";
 import {
   humanMessageExample1,
   humanMessageExample2,
@@ -23,7 +23,7 @@ import {
   aiMessageExample3,
 } from "../fewShotExamples/aiMessage/culturalAndPsychologicalIndicators.js";
 
-import {culturalAndPsychologicalIndicatorsSystemMessage} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/culturalAndPsychologicalIndicators/culturalAndPsychologicalIndicatorsSystemMessage.js";
+import { culturalAndPsychologicalIndicatorsSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/culturalAndPsychologicalIndicators/culturalAndPsychologicalIndicatorsSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -60,15 +60,18 @@ const extractCulturalAndPsychologicalIndicatorsPrompt = new ChatPromptTemplate({
 
 export async function extractCulturalAndPsychologicalIndicators(jobAd: string) {
   try {
-    const extractedCulturalAndPsychologicalIndicators = await extractCulturalAndPsychologicalIndicatorsPrompt
-      .pipe(
-        model.withStructuredOutput(culturalAndPsychologicalIndicatorsSchema, {
-          name: "culturalAndPsychologicalIndicators",
-        }),
-      )
-      .invoke({ placementText: jobAd, examples: examples });
+    const extractedCulturalAndPsychologicalIndicators =
+      await extractCulturalAndPsychologicalIndicatorsPrompt
+        .pipe(
+          model.withStructuredOutput(culturalAndPsychologicalIndicatorsSchema, {
+            name: "culturalAndPsychologicalIndicators",
+          }),
+        )
+        .invoke({ placementText: jobAd, examples: examples });
     const validatedCulturalAndPsychologicalIndicators =
-      culturalAndPsychologicalIndicatorsSchema.safeParse(extractedCulturalAndPsychologicalIndicators);
+      culturalAndPsychologicalIndicatorsSchema.safeParse(
+        extractedCulturalAndPsychologicalIndicators,
+      );
     if (validatedCulturalAndPsychologicalIndicators.success) {
       return validatedCulturalAndPsychologicalIndicators.data;
     } else return null;

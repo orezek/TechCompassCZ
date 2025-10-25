@@ -1,4 +1,4 @@
-import {z} from "zod";
+import { z } from "zod";
 
 export const originalAdSchema = z.object({
   _id: z
@@ -32,11 +32,6 @@ export const originalAdSchema = z.object({
     .nullable()
     .default(null)
     .describe("Is the ad still being advertised?"),
-  searchVector: z
-    .string()
-    .nullable()
-    .default(null)
-    .describe("String specifically crafted for semantic search."),
   salaryMin: z
     .number()
     .nullable()
@@ -62,5 +57,5 @@ export const originalAdSchema = z.object({
     .string()
     .nonempty()
     .nullable()
-    .describe("Raw job details as ingested from the ad.")
+    .describe("Raw job details as ingested from the ad."),
 });

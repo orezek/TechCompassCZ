@@ -11,7 +11,7 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import {benefitsAndPerksSchema} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/benefitsAndPerks/benefitsAndPerksSchema.js";
+import { benefitsAndPerksSchema } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/benefitsAndPerks/benefitsAndPerksSchema.js";
 import {
   humanMessageExample1,
   humanMessageExample2,
@@ -21,13 +21,12 @@ import {
   aiMessageExample1,
   aiMessageExample2,
   aiMessageExample3,
-} from "../fewShotExamples/aiMessage/benefitsAdnPerks.js"
+} from "../fewShotExamples/aiMessage/benefitsAdnPerks.js";
 import { benefitsAndPerksSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/benefitsAndPerks/benefitsAndPerksSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
 const GEM_MODELS_PRO = "gemini-2.5-pro";
-
 
 const model = new ChatGoogleGenerativeAI({
   model: GEM_MODELS_FLASH_LITE,
@@ -68,8 +67,9 @@ export async function extractBenefitsAndPerks(jobAd: string) {
         }),
       )
       .invoke({ placementText: jobAd, examples: examples });
-    const validatedBenefitsAndPerks =
-      benefitsAndPerksSchema.safeParse(extractedBenefitsAndPerks);
+    const validatedBenefitsAndPerks = benefitsAndPerksSchema.safeParse(
+      extractedBenefitsAndPerks,
+    );
     if (validatedBenefitsAndPerks.success) {
       return validatedBenefitsAndPerks.data;
     } else return null;

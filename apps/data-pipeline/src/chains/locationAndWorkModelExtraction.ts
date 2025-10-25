@@ -11,7 +11,7 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { locationAndWorkModelSchema} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/locationAndWorkModel/locationAndWorkModelSchema.js";
+import { locationAndWorkModelSchema } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/locationAndWorkModel/locationAndWorkModelSchema.js";
 import {
   humanMessageExample1,
   humanMessageExample2,
@@ -23,7 +23,7 @@ import {
   aiMessageExample3,
 } from "../fewShotExamples/aiMessage/locationAndWorkModel.js";
 
-import { locationAndWorkModelSystemMessage} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/locationAndWorkModel/locationAndWorkModelSystemMessage.js";
+import { locationAndWorkModelSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/locationAndWorkModel/locationAndWorkModelSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -60,15 +60,17 @@ const extractLocationAndWorkModelPrompt = new ChatPromptTemplate({
 
 export async function extractLocationAndWorkModel(jobAd: string) {
   try {
-    const extractedLocationAndWorkModel = await extractLocationAndWorkModelPrompt
-      .pipe(
-        model.withStructuredOutput(locationAndWorkModelSchema, {
-          name: "locationAndWorkModel",
-        }),
-      )
-      .invoke({ placementText: jobAd, examples: examples });
-    const validatedLocationAndWorkModel =
-      locationAndWorkModelSchema.safeParse(extractedLocationAndWorkModel);
+    const extractedLocationAndWorkModel =
+      await extractLocationAndWorkModelPrompt
+        .pipe(
+          model.withStructuredOutput(locationAndWorkModelSchema, {
+            name: "locationAndWorkModel",
+          }),
+        )
+        .invoke({ placementText: jobAd, examples: examples });
+    const validatedLocationAndWorkModel = locationAndWorkModelSchema.safeParse(
+      extractedLocationAndWorkModel,
+    );
     if (validatedLocationAndWorkModel.success) {
       return validatedLocationAndWorkModel.data;
     } else return null;

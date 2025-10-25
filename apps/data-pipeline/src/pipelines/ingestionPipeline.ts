@@ -16,7 +16,10 @@ import {
   stagedJobSchema,
 } from "../schemas/stagedJobSchema/stagedJobSchema.js";
 
-import { enrichedJobRecordsSchema, type EnrichedJobRecordsSchema } from "../schemas/enrichedJobSchema/enrichedJobSchema.js";
+import {
+  enrichedJobRecordsSchema,
+  type EnrichedJobRecordsSchema,
+} from "../schemas/enrichedJobSchema/enrichedJobSchema.js";
 
 import {
   ChatPromptTemplate,
@@ -24,7 +27,7 @@ import {
   PromptTemplate,
   SystemMessagePromptTemplate,
 } from "@langchain/core/prompts";
-import {originalAdSchema} from "../schemas/enrichedJobSchema/originalJobAdSchema/originalAdSchema.js";
+import { originalAdSchema } from "../schemas/enrichedJobSchema/originalJobAdSchema/originalAdSchema.js";
 
 await connectToDb();
 const db = client.db("it-jobs");
@@ -113,7 +116,9 @@ async function askGemini(jobDescription: string) {
 async function enrichedJobsAdder() {
   const operations: AnyBulkWriteOperation<EnrichedJobRecordsSchema>[] = [];
   await connectToDb();
-  const enrichedJobs = db.collection<EnrichedJobRecordsSchema>("enriched-job-records");
+  const enrichedJobs = db.collection<EnrichedJobRecordsSchema>(
+    "enriched-job-records",
+  );
   const query = {};
   const stagedJobs = staged_jobs.find(query);
   for await (const stagedJob of stagedJobs) {
@@ -122,12 +127,11 @@ async function enrichedJobsAdder() {
     if (result.success) {
       // MongoDB declarative BulkWrite
       const operation: AnyBulkWriteOperation<EnrichedJobRecordsSchema> = {
-
         updateOne: {
-          filter: {_id: result.data._id},
+          filter: { _id: result.data._id },
 
           update: {
-            $set: {originalAdData: result.data},
+            $set: { originalAdData: result.data },
 
             // $setOnInsert: {
             //   analyticalInsights: {},
@@ -151,8 +155,7 @@ async function enrichedJobsAdder() {
     console.log(`  - ${bulkResult.modifiedCount} existing jobs updated.`);
     console.log(`  - ${bulkResult.upsertedCount} total upserts.`);
     console.log(`  - ${bulkResult.matchedCount} total matched records.`);
-  }
-  else {
+  } else {
     console.log("No valid jobs to process.");
   }
   await client.close();
@@ -175,7 +178,7 @@ async function enrichedJobsAdder() {
 // }
 
 try {
- // await askGemini("some text");
+  // await askGemini("some text");
   await fileExtractor();
   console.log("The extraction ended!");
   //await client.close();

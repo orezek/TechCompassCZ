@@ -11,7 +11,7 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import {qualificationsAndExperienceSchema} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/qualificationAndExperience/qualificationAndExperienceSchema.js";
+import { qualificationsAndExperienceSchema } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/qualificationAndExperience/qualificationAndExperienceSchema.js";
 import {
   humanMessageExample1,
   humanMessageExample2,
@@ -23,7 +23,7 @@ import {
   aiMessageExample3,
 } from "../fewShotExamples/aiMessage/qualificationsAndExperience.js";
 
-import { qualificationAndExperienceSystemMessage} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/qualificationAndExperience/qualificationAndExperienceSystemMessage.js";
+import { qualificationAndExperienceSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/qualificationAndExperience/qualificationAndExperienceSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -60,15 +60,18 @@ const extractQualificationAndExperiencePrompt = new ChatPromptTemplate({
 
 export async function extractQualificationAndExperience(jobAd: string) {
   try {
-    const extractedQualificationAndExperience = await extractQualificationAndExperiencePrompt
-      .pipe(
-        model.withStructuredOutput(qualificationsAndExperienceSchema, {
-          name: "qualificationAndExperience",
-        }),
-      )
-      .invoke({ placementText: jobAd, examples: examples });
+    const extractedQualificationAndExperience =
+      await extractQualificationAndExperiencePrompt
+        .pipe(
+          model.withStructuredOutput(qualificationsAndExperienceSchema, {
+            name: "qualificationAndExperience",
+          }),
+        )
+        .invoke({ placementText: jobAd, examples: examples });
     const validatedQualificationAndExperience =
-      qualificationsAndExperienceSchema.safeParse(extractedQualificationAndExperience);
+      qualificationsAndExperienceSchema.safeParse(
+        extractedQualificationAndExperience,
+      );
     if (validatedQualificationAndExperience.success) {
       return validatedQualificationAndExperience.data;
     } else return null;

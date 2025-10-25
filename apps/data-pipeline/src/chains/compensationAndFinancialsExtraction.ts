@@ -23,7 +23,7 @@ import {
   aiMessageExample3,
 } from "../fewShotExamples/aiMessage/compensationAndFinancials.js";
 
-import {compensationAndFinancialsSystemMessage} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/compensationAndFinancials/compensationAndFinancialsSystemMessage.js";
+import { compensationAndFinancialsSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/compensationAndFinancials/compensationAndFinancialsSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -60,15 +60,19 @@ const extractCompensationAndFinancialsPrompt = new ChatPromptTemplate({
 
 export async function extractCompensationAndFinancials(jobAd: string) {
   try {
-    const extractedCompensationAndFinancials = await extractCompensationAndFinancialsPrompt
-      .pipe(
-        model.withStructuredOutput(compensationAndFinancialsSchema, {
-          name: "compensationAndFinancials",
-        }),
-      )
-      .invoke({ placementText: jobAd, examples: examples });
+    console.log(`The name of the running function: ${"extractedCompensationAndFinancials"}`);
+    const extractedCompensationAndFinancials =
+      await extractCompensationAndFinancialsPrompt
+        .pipe(
+          model.withStructuredOutput(compensationAndFinancialsSchema, {
+            name: "compensationAndFinancials",
+          }),
+        )
+        .invoke({ placementText: jobAd, examples: examples });
     const validatedCompensationAndFinancials =
-      compensationAndFinancialsSchema.safeParse(extractedCompensationAndFinancials);
+      compensationAndFinancialsSchema.safeParse(
+        extractedCompensationAndFinancials,
+      );
     if (validatedCompensationAndFinancials.success) {
       return validatedCompensationAndFinancials.data;
     } else return null;

@@ -23,7 +23,7 @@ import {
   aiMessageExample3,
 } from "../fewShotExamples/aiMessage/contractualDetails.js";
 
-import {contractualDetailsSystemMessage} from "../schemas/enrichedJobSchema/analyticalInsightsSchema/contractualDetails/contractualDetailsSystemMessage.js";
+import { contractualDetailsSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/contractualDetails/contractualDetailsSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -67,8 +67,9 @@ export async function extractContractualDetails(jobAd: string) {
         }),
       )
       .invoke({ placementText: jobAd, examples: examples });
-    const validatedContractualDetails =
-      contractualDetailsSchema.safeParse(extractedContractualDetails);
+    const validatedContractualDetails = contractualDetailsSchema.safeParse(
+      extractedContractualDetails,
+    );
     if (validatedContractualDetails.success) {
       return validatedContractualDetails.data;
     } else return null;

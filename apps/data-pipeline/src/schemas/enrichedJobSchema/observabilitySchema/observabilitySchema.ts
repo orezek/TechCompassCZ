@@ -1,8 +1,6 @@
 import { z } from "zod";
-import {benefitsAndPerksSchema} from "../analyticalInsightsSchema/benefitsAndPerks/benefitsAndPerksSchema.js";
-import {
-  careerDevelopmentAndRecruitmentInsightsSchema
-} from "../analyticalInsightsSchema/careerDevelopmentAndRecruitmentInsights/careerDevelopmentAndRecruitmentInsightsSchema.js";
+import { benefitsAndPerksSchema } from "../analyticalInsightsSchema/benefitsAndPerks/benefitsAndPerksSchema.js";
+import { careerDevelopmentAndRecruitmentInsightsSchema } from "../analyticalInsightsSchema/careerDevelopmentAndRecruitmentInsights/careerDevelopmentAndRecruitmentInsightsSchema.js";
 // 1. The schema for a single enrichment module (e.g., the Benefits Parser)
 const enrichmentStepSchema = z.object({
   status: z
@@ -51,4 +49,3 @@ export const pipelineMetadataSchema = z.object({
   technicalSkillsAndMethodologies: enrichmentStepSchema,
   workloadAndEnvironmentContext: enrichmentStepSchema,
 });
-
