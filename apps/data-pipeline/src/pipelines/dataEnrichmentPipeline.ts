@@ -1,18 +1,18 @@
 import * as dotenv from "dotenv";
 import { connectToLocalMongo, localClient } from "../mongoConnectionDb.js";
 import { type EnrichedJobRecordsSchema } from "../schemas/enrichedJobSchema/enrichedJobSchema.js";
-import { extractTechnicalSkillsAndMethodologies } from "../chains/technicalSkillsAndMethodologiesExtraction.js";
-import { extractCorePositionAndDetails } from "../chains/corePositionDetailsExtraction.js";
-import { extractBenefitsAndPerks } from "../chains/benefitsAndPerksExtraction.js";
-import { extractCareerDevelopmentAndRecruitment } from "./../chains/careerDevelopmentAndRecruitmentExtraction.js";
+import { extractTechnicalSkillsAndMethodologies } from "../chains/dataEnrichment/technicalSkillsAndMethodologiesExtraction.js";
+import { extractCorePositionAndDetails } from "../chains/dataEnrichment/corePositionDetailsExtraction.js";
+import { extractBenefitsAndPerks } from "../chains/dataEnrichment/benefitsAndPerksExtraction.js";
+import { extractCareerDevelopmentAndRecruitment } from "../chains/dataEnrichment/careerDevelopmentAndRecruitmentExtraction.js";
 import type { AnyBulkWriteOperation } from "mongodb";
-import { extractCompanyAndTeamContext } from "../chains/companyAndTeamContextExtraction.js";
-import { extractCompensationAndFinancials } from "../chains/compensationAndFinancialsExtraction.js";
-import { extractContractualDetails } from "../chains/contractualDetailsExtraction.js";
-import { extractCulturalAndPsychologicalIndicators } from "../chains/culturalAndPsychologicalIndicators.js";
-import { extractLocationAndWorkModel } from "../chains/locationAndWorkModelExtraction.js";
-import { extractQualificationAndExperience } from "../chains/qualificationAndExperienceExtraction.js";
-import { extractWorkloadAndEnvironmentContext } from "../chains/workloadAndEnvironmentExtraction.js";
+import { extractCompanyAndTeamContext } from "../chains/dataEnrichment/companyAndTeamContextExtraction.js";
+import { extractCompensationAndFinancials } from "../chains/dataEnrichment/compensationAndFinancialsExtraction.js";
+import { extractContractualDetails } from "../chains/dataEnrichment/contractualDetailsExtraction.js";
+import { extractCulturalAndPsychologicalIndicators } from "../chains/dataEnrichment/culturalAndPsychologicalIndicators.js";
+import { extractLocationAndWorkModel } from "../chains/dataEnrichment/locationAndWorkModelExtraction.js";
+import { extractQualificationAndExperience } from "../chains/dataEnrichment/qualificationAndExperienceExtraction.js";
+import { extractWorkloadAndEnvironmentContext } from "../chains/dataEnrichment/workloadAndEnvironmentExtraction.js";
 
 dotenv.config();
 

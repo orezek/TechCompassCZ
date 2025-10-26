@@ -11,19 +11,18 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { workloadAndEnvironmentContextSchema } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/workloadAndEnvironmentContext/workloadAndEnvironmentContextSchema.js";
+import { corePositionDetailsSchema } from "../../schemas/enrichedJobSchema/analyticalInsightsSchema/corePositionDetails/corePositionDetailsSchema.js";
 import {
   humanMessageExample1,
   humanMessageExample2,
   humanMessageExample3,
-} from "../fewShotExamples/humanMessage/adExamples.js";
+} from "./fewShotExamples/humanMessage/adExamples.js";
 import {
   aiMessageExample1,
   aiMessageExample2,
   aiMessageExample3,
-} from "../fewShotExamples/aiMessage/workloadAndEnvironmentContext.js";
-
-import { workloadAndEnvironmentContextSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/workloadAndEnvironmentContext/workloadAndEnvironmentContextSystemMessage.js";
+} from "./fewShotExamples/aiMessage/corePositionDetails.js";
+import { corePositionDetailsSystemMessage } from "./systemMessages/corePositionDetailsSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -35,7 +34,7 @@ const model = new ChatGoogleGenerativeAI({
 });
 
 const systemMessage = PromptTemplate.fromTemplate(
-  workloadAndEnvironmentContextSystemMessage,
+  corePositionDetailsSystemMessage,
 );
 
 const humanMessage = PromptTemplate.fromTemplate("{placementText}");
@@ -49,7 +48,7 @@ const examples = [
   new AIMessage(JSON.stringify(aiMessageExample3)),
 ];
 
-const extractWorkloadAndEnvironmentContextPrompt = new ChatPromptTemplate({
+const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
   inputVariables: ["placementText", "examples"],
   promptMessages: [
     new SystemMessagePromptTemplate(systemMessage),
@@ -58,26 +57,25 @@ const extractWorkloadAndEnvironmentContextPrompt = new ChatPromptTemplate({
   ],
 });
 
-export async function extractWorkloadAndEnvironmentContext(jobAd: string) {
+export async function extractCorePositionAndDetails(jobAd: string) {
   try {
-    const extractedWorkloadAndEnvironmentContext =
-      await extractWorkloadAndEnvironmentContextPrompt
+    const extractedCorePositionDetails =
+      await extractCorePositionAndDetailsPrompt
         .pipe(
-          model.withStructuredOutput(workloadAndEnvironmentContextSchema, {
-            name: "workloadAndEnvironmentContext",
+          model.withStructuredOutput(corePositionDetailsSchema, {
+            name: "corePositionAndDetails",
           }),
         )
         .invoke({ placementText: jobAd, examples: examples });
-    console.log(`The name of the running function: ${"extractWorkloadAndEnvironmentContext"}`);
-    const validatedWorkloadAndEnvironmentContext =
-      workloadAndEnvironmentContextSchema.safeParse(
-        extractedWorkloadAndEnvironmentContext,
-      );
-    if (validatedWorkloadAndEnvironmentContext.success) {
-      return validatedWorkloadAndEnvironmentContext.data;
+    console.log(`The name of the running function: ${"extractCorePositionAndDetails"}`);
+    const validatedCorePositionDetails = corePositionDetailsSchema.safeParse(
+      extractedCorePositionDetails,
+    );
+    if (validatedCorePositionDetails.success) {
+      return validatedCorePositionDetails.data;
     } else return null;
   } catch (e) {
-    console.error("Failed to extract the WorkloadAndEnvironmentContext.");
+    console.error("Failed to extract the CorePositionDetails.");
     throw e;
   }
 }

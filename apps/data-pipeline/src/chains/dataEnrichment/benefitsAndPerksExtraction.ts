@@ -11,19 +11,18 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { contractualDetailsSchema } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/contractualDetails/contractualDetailsSchema.js";
+import { benefitsAndPerksSchema } from "../../schemas/enrichedJobSchema/analyticalInsightsSchema/benefitsAndPerks/benefitsAndPerksSchema.js";
 import {
   humanMessageExample1,
   humanMessageExample2,
   humanMessageExample3,
-} from "../fewShotExamples/humanMessage/adExamples.js";
+} from "./fewShotExamples/humanMessage/adExamples.js";
 import {
   aiMessageExample1,
   aiMessageExample2,
   aiMessageExample3,
-} from "../fewShotExamples/aiMessage/contractualDetails.js";
-
-import { contractualDetailsSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/contractualDetails/contractualDetailsSystemMessage.js";
+} from "./fewShotExamples/aiMessage/benefitsAdnPerks.js";
+import { benefitsAndPerksSystemMessage } from "./systemMessages/benefitsAndPerksSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -32,10 +31,11 @@ const GEM_MODELS_PRO = "gemini-2.5-pro";
 const model = new ChatGoogleGenerativeAI({
   model: GEM_MODELS_FLASH_LITE,
   temperature: 0,
+  maxRetries: 3,
 });
 
 const systemMessage = PromptTemplate.fromTemplate(
-  contractualDetailsSystemMessage,
+  benefitsAndPerksSystemMessage,
 );
 
 const humanMessage = PromptTemplate.fromTemplate("{placementText}");
@@ -49,7 +49,7 @@ const examples = [
   new AIMessage(JSON.stringify(aiMessageExample3)),
 ];
 
-const extractContractualDetailsPrompt = new ChatPromptTemplate({
+const extractBenefitsAndPerksPrompt = new ChatPromptTemplate({
   inputVariables: ["placementText", "examples"],
   promptMessages: [
     new SystemMessagePromptTemplate(systemMessage),
@@ -58,24 +58,24 @@ const extractContractualDetailsPrompt = new ChatPromptTemplate({
   ],
 });
 
-export async function extractContractualDetails(jobAd: string) {
+export async function extractBenefitsAndPerks(jobAd: string) {
   try {
-    const extractedContractualDetails = await extractContractualDetailsPrompt
+    const extractedBenefitsAndPerks = await extractBenefitsAndPerksPrompt
       .pipe(
-        model.withStructuredOutput(contractualDetailsSchema, {
-          name: "contractualDetails",
+        model.withStructuredOutput(benefitsAndPerksSchema, {
+          name: "benefitsAndPerks",
         }),
       )
       .invoke({ placementText: jobAd, examples: examples });
-    console.log(`The name of the running function: ${"extractContractualDetails"}`);
-    const validatedContractualDetails = contractualDetailsSchema.safeParse(
-      extractedContractualDetails,
+    console.log(`The name of the running function: ${"extractBenefitsAndPerks"}`);
+    const validatedBenefitsAndPerks = benefitsAndPerksSchema.safeParse(
+      extractedBenefitsAndPerks,
     );
-    if (validatedContractualDetails.success) {
-      return validatedContractualDetails.data;
+    if (validatedBenefitsAndPerks.success) {
+      return validatedBenefitsAndPerks.data;
     } else return null;
   } catch (e) {
-    console.error("Failed to extract the ContractualDetails.");
+    console.error("Failed to extract the BenefitsAndPerks.");
     throw e;
   }
 }

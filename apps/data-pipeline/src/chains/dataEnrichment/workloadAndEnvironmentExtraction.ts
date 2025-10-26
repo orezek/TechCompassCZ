@@ -11,18 +11,19 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { careerDevelopmentAndRecruitmentInsightsSchema } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/careerDevelopmentAndRecruitmentInsights/careerDevelopmentAndRecruitmentInsightsSchema.js";
+import { workloadAndEnvironmentContextSchema } from "../../schemas/enrichedJobSchema/analyticalInsightsSchema/workloadAndEnvironmentContext/workloadAndEnvironmentContextSchema.js";
 import {
   humanMessageExample1,
   humanMessageExample2,
   humanMessageExample3,
-} from "../fewShotExamples/humanMessage/adExamples.js";
+} from "./fewShotExamples/humanMessage/adExamples.js";
 import {
   aiMessageExample1,
   aiMessageExample2,
   aiMessageExample3,
-} from "../fewShotExamples/aiMessage/careerDevelopmentAndRecruitmentInsights.js";
-import { careerDevelopmentAndRecruitmentInsightsSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/careerDevelopmentAndRecruitmentInsights/careerDevelopmentAndRecruitmentInsightsSystemMessage.js";
+} from "./fewShotExamples/aiMessage/workloadAndEnvironmentContext.js";
+
+import { workloadAndEnvironmentContextSystemMessage } from "./systemMessages/workloadAndEnvironmentContextSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -34,7 +35,7 @@ const model = new ChatGoogleGenerativeAI({
 });
 
 const systemMessage = PromptTemplate.fromTemplate(
-  careerDevelopmentAndRecruitmentInsightsSystemMessage,
+  workloadAndEnvironmentContextSystemMessage,
 );
 
 const humanMessage = PromptTemplate.fromTemplate("{placementText}");
@@ -48,7 +49,7 @@ const examples = [
   new AIMessage(JSON.stringify(aiMessageExample3)),
 ];
 
-const extractCareerDevelopmentAndRecruitmentPrompt = new ChatPromptTemplate({
+const extractWorkloadAndEnvironmentContextPrompt = new ChatPromptTemplate({
   inputVariables: ["placementText", "examples"],
   promptMessages: [
     new SystemMessagePromptTemplate(systemMessage),
@@ -57,29 +58,26 @@ const extractCareerDevelopmentAndRecruitmentPrompt = new ChatPromptTemplate({
   ],
 });
 
-export async function extractCareerDevelopmentAndRecruitment(jobAd: string) {
+export async function extractWorkloadAndEnvironmentContext(jobAd: string) {
   try {
-    const extractedCareerDevelopmentAndRecruitment =
-      await extractCareerDevelopmentAndRecruitmentPrompt
+    const extractedWorkloadAndEnvironmentContext =
+      await extractWorkloadAndEnvironmentContextPrompt
         .pipe(
-          model.withStructuredOutput(
-            careerDevelopmentAndRecruitmentInsightsSchema,
-            {
-              name: "careerDevelopmentAndRecruitmentInsights",
-            },
-          ),
+          model.withStructuredOutput(workloadAndEnvironmentContextSchema, {
+            name: "workloadAndEnvironmentContext",
+          }),
         )
         .invoke({ placementText: jobAd, examples: examples });
-    console.log(`The name of the running function: ${"extractCareerDevelopmentAndRecruitment"}`);
-    const validatedCareerDevelopmentAndRecruitment =
-      careerDevelopmentAndRecruitmentInsightsSchema.safeParse(
-        extractedCareerDevelopmentAndRecruitment,
+    console.log(`The name of the running function: ${"extractWorkloadAndEnvironmentContext"}`);
+    const validatedWorkloadAndEnvironmentContext =
+      workloadAndEnvironmentContextSchema.safeParse(
+        extractedWorkloadAndEnvironmentContext,
       );
-    if (validatedCareerDevelopmentAndRecruitment.success) {
-      return validatedCareerDevelopmentAndRecruitment.data;
+    if (validatedWorkloadAndEnvironmentContext.success) {
+      return validatedWorkloadAndEnvironmentContext.data;
     } else return null;
   } catch (e) {
-    console.error("Failed to extract the CareerDevelopmentAndRecruitment.");
+    console.error("Failed to extract the WorkloadAndEnvironmentContext.");
     throw e;
   }
 }

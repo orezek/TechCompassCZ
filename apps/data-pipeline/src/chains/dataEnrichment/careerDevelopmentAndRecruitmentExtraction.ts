@@ -11,19 +11,18 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { compensationAndFinancialsSchema } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/compensationAndFinancials/compensationAndFinancialsSchema.js";
+import { careerDevelopmentAndRecruitmentInsightsSchema } from "../../schemas/enrichedJobSchema/analyticalInsightsSchema/careerDevelopmentAndRecruitmentInsights/careerDevelopmentAndRecruitmentInsightsSchema.js";
 import {
   humanMessageExample1,
   humanMessageExample2,
   humanMessageExample3,
-} from "../fewShotExamples/humanMessage/adExamples.js";
+} from "./fewShotExamples/humanMessage/adExamples.js";
 import {
   aiMessageExample1,
   aiMessageExample2,
   aiMessageExample3,
-} from "../fewShotExamples/aiMessage/compensationAndFinancials.js";
-
-import { compensationAndFinancialsSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/compensationAndFinancials/compensationAndFinancialsSystemMessage.js";
+} from "./fewShotExamples/aiMessage/careerDevelopmentAndRecruitmentInsights.js";
+import { careerDevelopmentAndRecruitmentInsightsSystemMessage } from "./systemMessages/careerDevelopmentAndRecruitmentInsightsSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -35,7 +34,7 @@ const model = new ChatGoogleGenerativeAI({
 });
 
 const systemMessage = PromptTemplate.fromTemplate(
-  compensationAndFinancialsSystemMessage,
+  careerDevelopmentAndRecruitmentInsightsSystemMessage,
 );
 
 const humanMessage = PromptTemplate.fromTemplate("{placementText}");
@@ -49,7 +48,7 @@ const examples = [
   new AIMessage(JSON.stringify(aiMessageExample3)),
 ];
 
-const extractCompensationAndFinancialsPrompt = new ChatPromptTemplate({
+const extractCareerDevelopmentAndRecruitmentPrompt = new ChatPromptTemplate({
   inputVariables: ["placementText", "examples"],
   promptMessages: [
     new SystemMessagePromptTemplate(systemMessage),
@@ -58,26 +57,29 @@ const extractCompensationAndFinancialsPrompt = new ChatPromptTemplate({
   ],
 });
 
-export async function extractCompensationAndFinancials(jobAd: string) {
+export async function extractCareerDevelopmentAndRecruitment(jobAd: string) {
   try {
-    const extractedCompensationAndFinancials =
-      await extractCompensationAndFinancialsPrompt
+    const extractedCareerDevelopmentAndRecruitment =
+      await extractCareerDevelopmentAndRecruitmentPrompt
         .pipe(
-          model.withStructuredOutput(compensationAndFinancialsSchema, {
-            name: "compensationAndFinancials",
-          }),
+          model.withStructuredOutput(
+            careerDevelopmentAndRecruitmentInsightsSchema,
+            {
+              name: "careerDevelopmentAndRecruitmentInsights",
+            },
+          ),
         )
         .invoke({ placementText: jobAd, examples: examples });
-    console.log(`The name of the running function: ${"extractedCompensationAndFinancials"}`);
-    const validatedCompensationAndFinancials =
-      compensationAndFinancialsSchema.safeParse(
-        extractedCompensationAndFinancials,
+    console.log(`The name of the running function: ${"extractCareerDevelopmentAndRecruitment"}`);
+    const validatedCareerDevelopmentAndRecruitment =
+      careerDevelopmentAndRecruitmentInsightsSchema.safeParse(
+        extractedCareerDevelopmentAndRecruitment,
       );
-    if (validatedCompensationAndFinancials.success) {
-      return validatedCompensationAndFinancials.data;
+    if (validatedCareerDevelopmentAndRecruitment.success) {
+      return validatedCareerDevelopmentAndRecruitment.data;
     } else return null;
   } catch (e) {
-    console.error("Failed to extract the CompensationAndFinancials.");
+    console.error("Failed to extract the CareerDevelopmentAndRecruitment.");
     throw e;
   }
 }

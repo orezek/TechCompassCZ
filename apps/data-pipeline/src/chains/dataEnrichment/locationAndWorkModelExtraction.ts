@@ -11,31 +11,31 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { qualificationsAndExperienceSchema } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/qualificationAndExperience/qualificationAndExperienceSchema.js";
+import { locationAndWorkModelSchema } from "../../schemas/enrichedJobSchema/analyticalInsightsSchema/locationAndWorkModel/locationAndWorkModelSchema.js";
 import {
   humanMessageExample1,
   humanMessageExample2,
   humanMessageExample3,
-} from "../fewShotExamples/humanMessage/adExamples.js";
+} from "./fewShotExamples/humanMessage/adExamples.js";
 import {
   aiMessageExample1,
   aiMessageExample2,
   aiMessageExample3,
-} from "../fewShotExamples/aiMessage/qualificationsAndExperience.js";
+} from "./fewShotExamples/aiMessage/locationAndWorkModel.js";
 
-import { qualificationAndExperienceSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/qualificationAndExperience/qualificationAndExperienceSystemMessage.js";
+import { locationAndWorkModelSystemMessage } from "./systemMessages/locationAndWorkModelSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
 const GEM_MODELS_PRO = "gemini-2.5-pro";
 
 const model = new ChatGoogleGenerativeAI({
-  model: GEM_MODELS_FLASH_LITE,
+  model: GEM_MODELS_FLASH,
   temperature: 0,
 });
 
 const systemMessage = PromptTemplate.fromTemplate(
-  qualificationAndExperienceSystemMessage,
+  locationAndWorkModelSystemMessage,
 );
 
 const humanMessage = PromptTemplate.fromTemplate("{placementText}");
@@ -49,7 +49,7 @@ const examples = [
   new AIMessage(JSON.stringify(aiMessageExample3)),
 ];
 
-const extractQualificationAndExperiencePrompt = new ChatPromptTemplate({
+const extractLocationAndWorkModelPrompt = new ChatPromptTemplate({
   inputVariables: ["placementText", "examples"],
   promptMessages: [
     new SystemMessagePromptTemplate(systemMessage),
@@ -58,26 +58,25 @@ const extractQualificationAndExperiencePrompt = new ChatPromptTemplate({
   ],
 });
 
-export async function extractQualificationAndExperience(jobAd: string) {
+export async function extractLocationAndWorkModel(jobAd: string) {
   try {
-    const extractedQualificationAndExperience =
-      await extractQualificationAndExperiencePrompt
+    const extractedLocationAndWorkModel =
+      await extractLocationAndWorkModelPrompt
         .pipe(
-          model.withStructuredOutput(qualificationsAndExperienceSchema, {
-            name: "qualificationAndExperience",
+          model.withStructuredOutput(locationAndWorkModelSchema, {
+            name: "locationAndWorkModel",
           }),
         )
         .invoke({ placementText: jobAd, examples: examples });
-    console.log(`The name of the running function: ${"extractQualificationAndExperience"}`);
-    const validatedQualificationAndExperience =
-      qualificationsAndExperienceSchema.safeParse(
-        extractedQualificationAndExperience,
-      );
-    if (validatedQualificationAndExperience.success) {
-      return validatedQualificationAndExperience.data;
+    console.log(`The name of the running function: ${"extractLocationAndWorkModel"}`);
+    const validatedLocationAndWorkModel = locationAndWorkModelSchema.safeParse(
+      extractedLocationAndWorkModel,
+    );
+    if (validatedLocationAndWorkModel.success) {
+      return validatedLocationAndWorkModel.data;
     } else return null;
   } catch (e) {
-    console.error("Failed to extract the QualificationAndExperience.");
+    console.error("Failed to extract the LocationAndWorkModel.");
     throw e;
   }
 }

@@ -11,19 +11,19 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { companyAndTeamContextSchema } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/companyAndTeamContext/companyAndTeamContextSchema.js";
+import { companyAndTeamContextSchema } from "../../schemas/enrichedJobSchema/analyticalInsightsSchema/companyAndTeamContext/companyAndTeamContextSchema.js";
 import {
   humanMessageExample1,
   humanMessageExample2,
   humanMessageExample3,
-} from "../fewShotExamples/humanMessage/adExamples.js";
+} from "./fewShotExamples/humanMessage/adExamples.js";
 import {
   aiMessageExample1,
   aiMessageExample2,
   aiMessageExample3,
-} from "../fewShotExamples/aiMessage/companyAndTeamContext.js";
+} from "./fewShotExamples/aiMessage/companyAndTeamContext.js";
 
-import { companyAndTeamContextSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/companyAndTeamContext/companyAndTeamContextSystemMessage.js";
+import { companyAndTeamContextSystemMessage } from "./systemMessages/companyAndTeamContextSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";

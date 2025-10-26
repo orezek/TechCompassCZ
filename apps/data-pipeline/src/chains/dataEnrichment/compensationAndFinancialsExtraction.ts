@@ -11,18 +11,19 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-import { corePositionDetailsSchema } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/corePositionDetails/corePositionDetailsSchema.js";
+import { compensationAndFinancialsSchema } from "../../schemas/enrichedJobSchema/analyticalInsightsSchema/compensationAndFinancials/compensationAndFinancialsSchema.js";
 import {
   humanMessageExample1,
   humanMessageExample2,
   humanMessageExample3,
-} from "../fewShotExamples/humanMessage/adExamples.js";
+} from "./fewShotExamples/humanMessage/adExamples.js";
 import {
   aiMessageExample1,
   aiMessageExample2,
   aiMessageExample3,
-} from "../fewShotExamples/aiMessage/corePositionDetails.js";
-import { corePositionDetailsSystemMessage } from "../schemas/enrichedJobSchema/analyticalInsightsSchema/corePositionDetails/corePositionDetailsSystemMessage.js";
+} from "./fewShotExamples/aiMessage/compensationAndFinancials.js";
+
+import { compensationAndFinancialsSystemMessage } from "./systemMessages/compensationAndFinancialsSystemMessage.js";
 
 const GEM_MODELS_FLASH_LITE = "gemini-2.5-flash-lite";
 const GEM_MODELS_FLASH = "gemini-2.5-flash";
@@ -34,7 +35,7 @@ const model = new ChatGoogleGenerativeAI({
 });
 
 const systemMessage = PromptTemplate.fromTemplate(
-  corePositionDetailsSystemMessage,
+  compensationAndFinancialsSystemMessage,
 );
 
 const humanMessage = PromptTemplate.fromTemplate("{placementText}");
@@ -48,7 +49,7 @@ const examples = [
   new AIMessage(JSON.stringify(aiMessageExample3)),
 ];
 
-const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
+const extractCompensationAndFinancialsPrompt = new ChatPromptTemplate({
   inputVariables: ["placementText", "examples"],
   promptMessages: [
     new SystemMessagePromptTemplate(systemMessage),
@@ -57,25 +58,26 @@ const extractCorePositionAndDetailsPrompt = new ChatPromptTemplate({
   ],
 });
 
-export async function extractCorePositionAndDetails(jobAd: string) {
+export async function extractCompensationAndFinancials(jobAd: string) {
   try {
-    const extractedCorePositionDetails =
-      await extractCorePositionAndDetailsPrompt
+    const extractedCompensationAndFinancials =
+      await extractCompensationAndFinancialsPrompt
         .pipe(
-          model.withStructuredOutput(corePositionDetailsSchema, {
-            name: "corePositionAndDetails",
+          model.withStructuredOutput(compensationAndFinancialsSchema, {
+            name: "compensationAndFinancials",
           }),
         )
         .invoke({ placementText: jobAd, examples: examples });
-    console.log(`The name of the running function: ${"extractCorePositionAndDetails"}`);
-    const validatedCorePositionDetails = corePositionDetailsSchema.safeParse(
-      extractedCorePositionDetails,
-    );
-    if (validatedCorePositionDetails.success) {
-      return validatedCorePositionDetails.data;
+    console.log(`The name of the running function: ${"extractedCompensationAndFinancials"}`);
+    const validatedCompensationAndFinancials =
+      compensationAndFinancialsSchema.safeParse(
+        extractedCompensationAndFinancials,
+      );
+    if (validatedCompensationAndFinancials.success) {
+      return validatedCompensationAndFinancials.data;
     } else return null;
   } catch (e) {
-    console.error("Failed to extract the CorePositionDetails.");
+    console.error("Failed to extract the CompensationAndFinancials.");
     throw e;
   }
 }
