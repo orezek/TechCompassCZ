@@ -1,12 +1,12 @@
 import {Db, MongoClient} from "mongodb";
 
-const CLOUD_URI = "mongodb+srv://jobcompass:jobcompass*@jobcompas.2wbteqm.mongodb.net/?appName=JobCompas";
+const CLOUD_URI = "mongodb+srv://jobcompass:jobcompass%2A@jobcompas.2wbteqm.mongodb.net/?appName=JobCompas";
 const LOCAL_URI = "mongodb://admin:password@localhost:27017";
 
 const LOCAL_DB_NAME = 'it-jobs';
 const CLOUD_DB_NAME = "it-jobs";
 
-const LOCAl_STAGED_COLLECTION_NAME = "staged-job-records";
+const LOCAL_STAGED_COLLECTION_NAME = "staged-job-records";
 const LOCAL_ENRICHED_COLLECTION_NAME = "enriched-job-records";
 
 const CLOUD_STAGED_COLLECTION_NAME = "staged-job-records";
@@ -89,7 +89,7 @@ export const closeCloudMongo =  async() => {
 export async function connectToLocalStagedJobRecords() {
   try {
     const itJobsDb = await connectToLocalItJobsDB();
-    if (itJobsDb) return itJobsDb.collection(LOCAl_STAGED_COLLECTION_NAME);
+    if (itJobsDb) return itJobsDb.collection(LOCAL_STAGED_COLLECTION_NAME);
   } catch (e) {
     console.error("Failed to connect to local staged-jobs-records collection", e);
     process.exit(1);
