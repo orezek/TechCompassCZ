@@ -1,29 +1,147 @@
-import { MongoClient } from "mongodb";
+import {Db, MongoClient} from "mongodb";
 
-const cloudUri = "mongodb+srv://jobcompass:jobcompass*@jobcompas.2wbteqm.mongodb.net/?appName=JobCompas"
+const CLOUD_URI = "mongodb+srv://jobcompass:jobcompass*@jobcompas.2wbteqm.mongodb.net/?appName=JobCompas";
+const LOCAL_URI = "mongodb://admin:password@localhost:27017";
 
-const localUri = "mongodb://admin:password@localhost:27017";
+const LOCAL_DB_NAME = 'it-jobs';
+const CLOUD_DB_NAME = "it-jobs";
+
+const LOCAl_STAGED_COLLECTION_NAME = "staged-job-records";
+const LOCAL_ENRICHED_COLLECTION_NAME = "enriched-job-records";
+
+const CLOUD_STAGED_COLLECTION_NAME = "staged-job-records";
+const CLOUD_ENRICHED_COLLECTION_NAME = "enriched-job-records";
+const CLOUD_PARENT_DOCUMENT_COLLECTION_NAME = "rag-parent";
+const CLOUD_CHUNK_DOCUMENT_COLLECTION_NAME = "rag-chunk";
 
 
-export const localClient = new MongoClient(localUri);
-export const cloudClient = new MongoClient(cloudUri);
+let localDb: Db | null = null;
+let cloudDb: Db | null = null;
+export const localClient = new MongoClient(LOCAL_URI);
+export const cloudClient = new MongoClient(CLOUD_URI);
 
-export async function connectToLocalMongo() {
+
+async function connectToLocalMongoInstance() {
   try {
     await localClient.connect();
-    console.log("Connected to Local Mongo.");
+    console.log("Connected to Local MongoDB.");
   } catch (error) {
-    console.log("Failed to connect to Local Mongo", error);
+    console.log("Failed to connect to Local MongoDB instance", error);
     process.exit(1);
   }
 }
 
-export const connectToCloudMongo = async () => {
+async function connectToLocalItJobsDB() {
+  try {
+    if (!localDb) {
+      await connectToLocalMongoInstance();
+      localDb = localClient.db(LOCAL_DB_NAME);
+    }
+    return localDb;
+  } catch (e) {
+    console.error("Failed to connect to Local It jobs db.", e);
+  }
+}
+
+export const closeLocalMongoInstance = async () => {
+  try {
+    await localClient.close();
+    console.log("Connection closed on Local MongoDB.");
+  } catch (e) {
+    console.error("Failed to close Local MongoDB instance: ", e);
+  }
+};
+
+
+
+const connectToCloudMongoInstance = async () => {
   try {
     await cloudClient.connect();
-    console.log("Connected to Cloud Mongo.");
+    console.log("Connected to Cloud MongoDB.");
   } catch (e) {
-    console.log("Failed to connect to Cloud Mongo", e);
+    console.error("Failed to connect to Cloud MongoDB instance.", e);
+    process.exit(1);
+  }
+};
+
+async function connectToCloudItJobsDb() {
+  try {
+    if (!cloudDb) {
+      await connectToCloudMongoInstance();
+      cloudDb = cloudClient.db(CLOUD_DB_NAME);
+    }
+    return cloudDb;
+  } catch (e) {
+    console.error("Failed to connect to Cloud It jobs db.", e);
+  }
+}
+
+export const closeCloudMongo =  async() => {
+  try {
+    await cloudClient.close();
+    console.log("Connection closed on Cloud MongoDB.");
+  } catch (e) {
+    console.error("Failed to close Cloud MongoDB:", e);
+  }
+}
+
+
+export async function connectToLocalStagedJobRecords() {
+  try {
+    const itJobsDb = await connectToLocalItJobsDB();
+    if (itJobsDb) return itJobsDb.collection(LOCAl_STAGED_COLLECTION_NAME);
+  } catch (e) {
+    console.error("Failed to connect to local staged-jobs-records collection", e);
+    process.exit(1);
+  }
+}
+
+export async function connectToLocalEnrichedJobRecords() {
+  try {
+    const itJobsDb = await connectToLocalItJobsDB();
+    if (itJobsDb) return itJobsDb.collection(LOCAL_ENRICHED_COLLECTION_NAME);
+  } catch (e) {
+    console.error("Failed to connect to local enriched-jobs-records collection", e);
+    process.exit(1);
+  }
+}
+
+export async function connectToCloudStageJobRecords() {
+  try {
+    const itJobsDb = await connectToCloudItJobsDb();
+    if(itJobsDb) return itJobsDb.collection(CLOUD_STAGED_COLLECTION_NAME);
+  } catch (e) {
+    console.error("Failed to connect to cloud staged-jobs-records collection", e);
+    process.exit(1);
+  }
+}
+
+export async function connectToCloudEnrichedJobRecords() {
+  try {
+    const itJobsDb = await connectToCloudItJobsDb();
+    if(itJobsDb) return itJobsDb.collection(CLOUD_ENRICHED_COLLECTION_NAME);
+  } catch (e) {
+    console.error("Failed to connect to cloud enriched-jobs-records collection", e);
+    process.exit(1);
+  }
+}
+
+export async function connectToCloudParentDocumentCollection() {
+  try {
+    const itJobsDb = await connectToCloudItJobsDb();
+    if(itJobsDb) return itJobsDb.collection(CLOUD_PARENT_DOCUMENT_COLLECTION_NAME);
+  } catch (e) {
+    console.error("Failed to connect to cloud parent-chunks collection", e);
+    process.exit(1);
+  }
+}
+
+export async function connectToCloudChunkDocumentCollection() {
+  try {
+    const itJobsDb = await connectToCloudItJobsDb();
+    if(itJobsDb) return itJobsDb.collection(CLOUD_CHUNK_DOCUMENT_COLLECTION_NAME);
+  } catch (e) {
+    console.error("Failed to connect to cloud rag-chunks collection", e);
     process.exit(1);
   }
 }

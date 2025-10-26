@@ -67,7 +67,9 @@ export async function extractContractualDetails(jobAd: string) {
         }),
       )
       .invoke({ placementText: jobAd, examples: examples });
-    console.log(`The name of the running function: ${"extractContractualDetails"}`);
+    console.log(
+      `The name of the running function: ${"extractContractualDetails"}`,
+    );
     const validatedContractualDetails = contractualDetailsSchema.safeParse(
       extractedContractualDetails,
     );

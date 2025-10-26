@@ -4,9 +4,13 @@ import * as csv from "fast-csv";
 import path from "path";
 import fs from "fs";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import * as hub from "langchain/hub/node";
 import type { AnyBulkWriteOperation } from "mongodb";
-import { connectToLocalMongo, connectToCloudMongo, localClient, cloudClient } from "../mongoConnectionDb.js";
+import {
+  connectToLocalMongo,
+  connectToCloudMongo,
+  localClient,
+  cloudClient,
+} from "../mongoConnectionDb.js";
 // Load env vars to node.js engine
 dotenv.config();
 
@@ -17,16 +21,9 @@ import {
 } from "../schemas/stagedJobSchema/stagedJobSchema.js";
 
 import {
-  enrichedJobRecordsSchema,
   type EnrichedJobRecordsSchema,
 } from "../schemas/enrichedJobSchema/enrichedJobSchema.js";
 
-import {
-  ChatPromptTemplate,
-  HumanMessagePromptTemplate,
-  PromptTemplate,
-  SystemMessagePromptTemplate,
-} from "@langchain/core/prompts";
 import { originalAdSchema } from "../schemas/enrichedJobSchema/originalJobAdSchema/originalAdSchema.js";
 
 await connectToLocalMongo();
@@ -34,7 +31,7 @@ const db = localClient.db("it-jobs");
 const staged_jobs = db.collection<StagedJobSchema>("staged-job-records");
 
 await connectToCloudMongo();
-const cloudDb = cloudClient.db('it-jobs');
+const cloudDb = cloudClient.db("it-jobs");
 const cloud_staged_jobs = cloudDb.collection<StagedJobSchema>("staged-job-records");
 const cloud_enriched_jobs = cloudDb.collection<EnrichedJobRecordsSchema>("enriched-job-records");
 

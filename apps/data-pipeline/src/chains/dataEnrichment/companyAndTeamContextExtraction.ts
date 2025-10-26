@@ -68,7 +68,9 @@ export async function extractCompanyAndTeamContext(jobAd: string) {
           }),
         )
         .invoke({ placementText: jobAd, examples: examples });
-    console.log(`The name of the running function: ${"extractCompanyAndTeamContext"}`);
+    console.log(
+      `The name of the running function: ${"extractCompanyAndTeamContext"}`,
+    );
     const validatedCompanyAndTeamContext =
       companyAndTeamContextSchema.safeParse(extractedCompanyAndTeamContext);
     if (validatedCompanyAndTeamContext.success) {

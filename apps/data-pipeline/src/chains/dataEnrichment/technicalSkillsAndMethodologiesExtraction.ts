@@ -67,7 +67,9 @@ export async function extractTechnicalSkillsAndMethodologies(jobAd: string) {
           }),
         )
         .invoke({ placementText: jobAd, examples: examples });
-    console.log(`The name of the running function: ${"extractTechnicalSkillsAndMethodologies"}`);
+    console.log(
+      `The name of the running function: ${"extractTechnicalSkillsAndMethodologies"}`,
+    );
     const validatedTechnicalSkillsAndMethodologies =
       technicalSkillsAndMethodologiesSchema.safeParse(
         extractedTechnicalSkillsAndMethodologies,

@@ -67,7 +67,9 @@ export async function extractCorePositionAndDetails(jobAd: string) {
           }),
         )
         .invoke({ placementText: jobAd, examples: examples });
-    console.log(`The name of the running function: ${"extractCorePositionAndDetails"}`);
+    console.log(
+      `The name of the running function: ${"extractCorePositionAndDetails"}`,
+    );
     const validatedCorePositionDetails = corePositionDetailsSchema.safeParse(
       extractedCorePositionDetails,
     );

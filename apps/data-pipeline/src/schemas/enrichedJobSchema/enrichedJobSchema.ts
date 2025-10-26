@@ -26,7 +26,9 @@ export const enrichedJobRecordsSchema = z.object({
     .describe(
       "Metadata for observability, tracking the processing history, model versions, and confidence scores.",
     ),
-  searchMetadata: searchDataSchema.optional().describe("Base data object for creating vector search.")
+  searchMetadata: searchDataSchema
+    .optional()
+    .describe("Base data object for creating vector search."),
 });
 
 export type EnrichedJobRecordsSchema = z.infer<typeof enrichedJobRecordsSchema>;

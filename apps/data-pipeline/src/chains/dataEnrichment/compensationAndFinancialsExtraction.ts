@@ -68,7 +68,9 @@ export async function extractCompensationAndFinancials(jobAd: string) {
           }),
         )
         .invoke({ placementText: jobAd, examples: examples });
-    console.log(`The name of the running function: ${"extractedCompensationAndFinancials"}`);
+    console.log(
+      `The name of the running function: ${"extractedCompensationAndFinancials"}`,
+    );
     const validatedCompensationAndFinancials =
       compensationAndFinancialsSchema.safeParse(
         extractedCompensationAndFinancials,

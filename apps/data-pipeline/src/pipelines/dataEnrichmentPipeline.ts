@@ -41,21 +41,33 @@ async function processStagedJobs() {
       extractedCulturalAndPsychologicalIndicators,
       extractedLocationAndWorkModel,
       extractedQualificationAndExperience,
-      extractedWorkloadAndEnvironmentContext
+      extractedWorkloadAndEnvironmentContext,
     ] = await Promise.all([
       extractCorePositionAndDetails(JSON.stringify(enrichedJob.originalAdData)),
-      extractTechnicalSkillsAndMethodologies(JSON.stringify(enrichedJob.originalAdData)),
+      extractTechnicalSkillsAndMethodologies(
+        JSON.stringify(enrichedJob.originalAdData),
+      ),
       extractBenefitsAndPerks(JSON.stringify(enrichedJob.originalAdData)),
-      extractCareerDevelopmentAndRecruitment(JSON.stringify(enrichedJob.originalAdData)),
+      extractCareerDevelopmentAndRecruitment(
+        JSON.stringify(enrichedJob.originalAdData),
+      ),
       extractCompanyAndTeamContext(JSON.stringify(enrichedJob.originalAdData)),
-      extractCompensationAndFinancials(JSON.stringify(enrichedJob.originalAdData)),
+      extractCompensationAndFinancials(
+        JSON.stringify(enrichedJob.originalAdData),
+      ),
       extractContractualDetails(JSON.stringify(enrichedJob.originalAdData)),
-      extractCulturalAndPsychologicalIndicators(JSON.stringify(enrichedJob.originalAdData)),
+      extractCulturalAndPsychologicalIndicators(
+        JSON.stringify(enrichedJob.originalAdData),
+      ),
       extractLocationAndWorkModel(JSON.stringify(enrichedJob.originalAdData)),
-      extractQualificationAndExperience(JSON.stringify(enrichedJob.originalAdData)),
-      extractWorkloadAndEnvironmentContext(JSON.stringify(enrichedJob.originalAdData))
+      extractQualificationAndExperience(
+        JSON.stringify(enrichedJob.originalAdData),
+      ),
+      extractWorkloadAndEnvironmentContext(
+        JSON.stringify(enrichedJob.originalAdData),
+      ),
     ]);
-    apiCounter+=11;
+    apiCounter += 11;
     console.log(`API call count: ${apiCounter}`);
     console.log(
       `All data extracted for job: ${enrichedJob.originalAdData?.jobTitle}`,

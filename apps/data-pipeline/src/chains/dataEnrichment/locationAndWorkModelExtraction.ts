@@ -68,7 +68,9 @@ export async function extractLocationAndWorkModel(jobAd: string) {
           }),
         )
         .invoke({ placementText: jobAd, examples: examples });
-    console.log(`The name of the running function: ${"extractLocationAndWorkModel"}`);
+    console.log(
+      `The name of the running function: ${"extractLocationAndWorkModel"}`,
+    );
     const validatedLocationAndWorkModel = locationAndWorkModelSchema.safeParse(
       extractedLocationAndWorkModel,
     );
