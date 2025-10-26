@@ -20,9 +20,7 @@ import {
   stagedJobSchema,
 } from "../schemas/stagedJobSchema/stagedJobSchema.js";
 
-import {
-  type EnrichedJobRecordsSchema,
-} from "../schemas/enrichedJobSchema/enrichedJobSchema.js";
+import { type EnrichedJobRecordsSchema } from "../schemas/enrichedJobSchema/enrichedJobSchema.js";
 
 import { originalAdSchema } from "../schemas/enrichedJobSchema/originalJobAdSchema/originalAdSchema.js";
 
@@ -32,8 +30,11 @@ const staged_jobs = db.collection<StagedJobSchema>("staged-job-records");
 
 await connectToCloudMongo();
 const cloudDb = cloudClient.db("it-jobs");
-const cloud_staged_jobs = cloudDb.collection<StagedJobSchema>("staged-job-records");
-const cloud_enriched_jobs = cloudDb.collection<EnrichedJobRecordsSchema>("enriched-job-records");
+const cloud_staged_jobs =
+  cloudDb.collection<StagedJobSchema>("staged-job-records");
+const cloud_enriched_jobs = cloudDb.collection<EnrichedJobRecordsSchema>(
+  "enriched-job-records",
+);
 
 async function fileExtractor() {
   let counter = 0;
