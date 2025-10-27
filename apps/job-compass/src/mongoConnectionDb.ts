@@ -1,4 +1,6 @@
 import { Db, MongoClient } from "mongodb";
+import type {StagedJobRecordsSchema} from "./schemas/stagedJobSchema/stagedJobRecordsSchema.js";
+import type {EnrichedJobRecordsSchema} from "./schemas/enrichedJobSchema/enrichedJobSchema.js";
 
 const CLOUD_URI =
   "mongodb+srv://jobcompass:jobcompass%2A@jobcompas.2wbteqm.mongodb.net/?appName=JobCompas";
@@ -73,7 +75,7 @@ async function connectToCloudItJobsDb() {
   }
 }
 
-export const closeCloudMongo = async () => {
+export const closeCloudMongoInstance = async () => {
   try {
     await cloudClient.close();
     console.log("Connection closed on Cloud MongoDB.");
@@ -82,10 +84,10 @@ export const closeCloudMongo = async () => {
   }
 };
 
-export async function connectToLocalStagedJobRecords() {
+export async function getLocalStagedJobRecordsCollection() {
   try {
     const itJobsDb = await connectToLocalItJobsDB();
-    if (itJobsDb) return itJobsDb.collection(LOCAL_STAGED_COLLECTION_NAME);
+    if (itJobsDb) return itJobsDb.collection<StagedJobRecordsSchema>(LOCAL_STAGED_COLLECTION_NAME);
   } catch (e) {
     console.error(
       "Failed to connect to local staged-jobs-records collection",
@@ -95,10 +97,10 @@ export async function connectToLocalStagedJobRecords() {
   }
 }
 
-export async function connectToLocalEnrichedJobRecords() {
+export async function getLocalEnrichedJobRecordsCollection() {
   try {
     const itJobsDb = await connectToLocalItJobsDB();
-    if (itJobsDb) return itJobsDb.collection(LOCAL_ENRICHED_COLLECTION_NAME);
+    if (itJobsDb) return itJobsDb.collection<EnrichedJobRecordsSchema>(LOCAL_ENRICHED_COLLECTION_NAME);
   } catch (e) {
     console.error(
       "Failed to connect to local enriched-jobs-records collection",
@@ -108,7 +110,7 @@ export async function connectToLocalEnrichedJobRecords() {
   }
 }
 
-export async function connectToCloudStageJobRecords() {
+export async function getCloudStageJobRecordsCollection() {
   try {
     const itJobsDb = await connectToCloudItJobsDb();
     if (itJobsDb) return itJobsDb.collection(CLOUD_STAGED_COLLECTION_NAME);
@@ -121,7 +123,7 @@ export async function connectToCloudStageJobRecords() {
   }
 }
 
-export async function connectToCloudEnrichedJobRecords() {
+export async function getCloudEnrichedJobRecordsCollection() {
   try {
     const itJobsDb = await connectToCloudItJobsDb();
     if (itJobsDb) return itJobsDb.collection(CLOUD_ENRICHED_COLLECTION_NAME);
@@ -134,7 +136,7 @@ export async function connectToCloudEnrichedJobRecords() {
   }
 }
 
-export async function connectToCloudParentDocumentCollection() {
+export async function getCloudParentDocumentCollection() {
   try {
     const itJobsDb = await connectToCloudItJobsDb();
     if (itJobsDb)
@@ -145,7 +147,7 @@ export async function connectToCloudParentDocumentCollection() {
   }
 }
 
-export async function connectToCloudChunkDocumentCollection() {
+export async function getCloudChunkDocumentCollection() {
   try {
     const itJobsDb = await connectToCloudItJobsDb();
     if (itJobsDb)

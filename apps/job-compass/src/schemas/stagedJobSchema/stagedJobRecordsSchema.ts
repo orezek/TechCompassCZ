@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 // For the csv to json parsing and validation
-export const stagedJobSchema = z.object({
+export const stagedJobRecordsSchema = z.object({
   _id: z
     .string()
     .default(() => uuidv4())
@@ -67,4 +67,4 @@ export const stagedJobSchema = z.object({
   }, z.date()),
 });
 
-export type StagedJobSchema = z.infer<typeof stagedJobSchema>;
+export type StagedJobRecordsSchema = z.infer<typeof stagedJobRecordsSchema>;
