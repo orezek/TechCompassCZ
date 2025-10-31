@@ -2,7 +2,7 @@ import { Db, MongoClient } from "mongodb";
 import type {StagedJobRecordsSchema} from "./schemas/stagedJobSchema/stagedJobRecordsSchema.js";
 import type {EnrichedJobRecordsSchema} from "./schemas/enrichedJobSchema/enrichedJobSchema.js";
 
-const CLOUD_URI =
+export const CLOUD_URI =
   "mongodb+srv://jobcompass:jobcompass%2A@jobcompas.2wbteqm.mongodb.net/?appName=JobCompas";
 const LOCAL_URI = "mongodb://admin:password@localhost:27017";
 
@@ -15,7 +15,7 @@ const LOCAL_ENRICHED_COLLECTION_NAME = "enriched-job-records";
 const CLOUD_STAGED_COLLECTION_NAME = "staged-job-records";
 const CLOUD_ENRICHED_COLLECTION_NAME = "enriched-job-records";
 const CLOUD_PARENT_DOCUMENT_COLLECTION_NAME = "rag-parent";
-const CLOUD_CHUNK_DOCUMENT_COLLECTION_NAME = "rag-chunk";
+const CLOUD_CHUNK_DOCUMENT_COLLECTION_NAME = "rag-chunks";
 
 let localDb: Db | null = null;
 let cloudDb: Db | null = null;

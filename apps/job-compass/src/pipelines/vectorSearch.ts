@@ -1,53 +1,62 @@
-// All correct v1.x imports
-import { MongoDBAtlasVectorSearch, MongoDBStore } from "@langchain/mongodb";
-import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
-import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { ParentDocumentRetriever } from "langchain/retrievers/parent_document";
-import { Document } from "@langchain/core/documents";
+import {geminiFlashLite} from "../models/google/geminiModels.js";
+import {googleEmbeddingModel} from "../models/google/embeddingModels.js";
+import { MongoDBAtlasVectorSearch} from "@langchain/mongodb";
+import {closeCloudMongoInstance, getCloudChunkDocumentCollection} from "../mongoConnectionDb.js";
+import type { Document } from "@langchain/core/documents";
 
-import {
-  getCloudChunkDocumentCollection,
-  getCloudParentDocumentCollection,
-  getLocalEnrichedJobRecordsCollection
-} from "../mongoConnectionDb.js";
+// new
+import { createAgent, tool} from "langchain";
+import * as z from "zod";
 
-const VECTOR_INDEX_NAME = "vector_index";
-
-const enrichedJobCollection = await getLocalEnrichedJobRecordsCollection();
-const parentDocumentCollection = await getCloudParentDocumentCollection();
-const chunkCollection = await getCloudChunkDocumentCollection();
-
-const ID_KEY = "doc_id";
-
-async function setupRetriever() {
-
-  const embeddings = new GoogleGenerativeAIEmbeddings({
-    modelName: "embedding-001",
-  });
+const ragChunkCollection = await getCloudChunkDocumentCollection();
+if (!ragChunkCollection) throw new Error("Check your Mongo Database connection!");
 
 
-  const vectorstore = new MongoDBAtlasVectorSearch(embeddings, {
-    collection: chunkCollection!,
-    indexName: VECTOR_INDEX_NAME,
-    embeddingKey: "embedding",
-  });
+const retriever = new MongoDBAtlasVectorSearch(googleEmbeddingModel, {
+  collection: ragChunkCollection,
+  indexName: "vector_index",
+  textKey: "text",
+  embeddingKey: "embedding",
+})
 
-  const docstore = new MongoDBStore({
-    collection: parentDocumentCollection!,
-    primaryKey: ID_KEY,
-  });
+const retrieveDocs = tool (
+  async (input) => {
+    console.log(input);
+    const results: Document[] = await retriever.similaritySearch(input.query, 5);
+    return results.map((d) => d.pageContent).join("\n\n");
+  },
+  {
+    name: "retrieve_docs",
+    description: "Retrieve the most relevant documents for a user query",
+    schema: z.object({
+      query: z.string().describe("User's information need or question."),
+    }),
+  }
+)
 
-  const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 500,
-    chunkOverlap: 50,
-  });
 
-  const retriever = new ParentDocumentRetriever({
-    vectorstore,
-    docstore,
-    childSplitter: splitter,
-    idKey: ID_KEY,
-    childK: 20,
-  })
-  return {retriever}
-}
+const agent = createAgent({
+  model: geminiFlashLite,
+  tools: [retrieveDocs],
+  systemPrompt: `You are a retrieval-augmented question answering agent.
+    When asked something, use the 'retrieve_docs' tool to fetch relevant context.
+    Always base your answer on the retrieved context.
+    Be concise and accurate. If information is missing, say so. If the tools did not find the information, report it to the user. Always output to the user the query you asked the tool.`,
+})
+
+const response = await agent.invoke({
+  messages: [
+    {
+      role: "user",
+      content: "Is there any job as an DB admin?",
+    },
+  ],
+});
+const finalMessage = response.messages.at(-1);
+console.log(finalMessage?.content);
+
+//
+// const results: Document[] = await retriever.similaritySearch("hovno", 5);
+// console.log("Printing from DB");
+// console.log(results);
+await closeCloudMongoInstance();

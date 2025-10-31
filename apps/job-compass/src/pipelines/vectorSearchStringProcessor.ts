@@ -1,4 +1,4 @@
-import { geminiFlashLite } from "../models/geminiModels.js";
+import { geminiFlashLite } from "../models/google/geminiModels.js";
 import * as hub from "langchain/hub/node";
 import {closeLocalMongoInstance, getLocalEnrichedJobRecordsCollection} from "../mongoConnectionDb.js";
 import type { EnrichedJobRecordsSchema } from "../schemas/enrichedJobSchema/enrichedJobSchema.js";

@@ -18,7 +18,7 @@ import { type EnrichedJobRecordsSchema } from "../schemas/enrichedJobSchema/enri
 import { originalAdSchema } from "../schemas/enrichedJobSchema/originalJobAdSchema/originalAdSchema.js";
 import { stagedJobRecordsSchema } from "../schemas/stagedJobSchema/stagedJobRecordsSchema.js";
 
-const staged_jobs = await getLocalStagedJobRecordsCollection();
+const stagedJobsCollection = await getLocalStagedJobRecordsCollection();
 
 
 async function jobAdExtractor() {
@@ -45,7 +45,7 @@ async function jobAdExtractor() {
         const checkPromise = (async () => {
           try {
             counter++;
-            const document: StagedJobRecordsSchema | null = await staged_jobs!.findOne({
+            const document: StagedJobRecordsSchema | null = await stagedJobsCollection!.findOne({
               sourceId: validJson.sourceId,
             });
             if (!document) {
@@ -62,7 +62,7 @@ async function jobAdExtractor() {
       .on("end", async (rowCount: number) => {
         await Promise.all(dbCheckPromises);
         if (results.length > 0) {
-          await staged_jobs!.insertMany(results);
+          await stagedJobsCollection!.insertMany(results);
         }
         console.log(`Parsed csv rows: ${rowCount}.`);
         console.log(`Inserted new objects: ${results.length}.`);
@@ -75,7 +75,7 @@ async function jobAdExtractor() {
 async function enrichedJobsAdder() {
   const operations: AnyBulkWriteOperation<EnrichedJobRecordsSchema>[] = [];
   const enrichedJobs = await getLocalEnrichedJobRecordsCollection();
-  const stagedJobs = staged_jobs!.find({});
+  const stagedJobs = stagedJobsCollection!.find({});
   for await (const stagedJob of stagedJobs) {
     const result = originalAdSchema.safeParse(stagedJob);
     if (result.success) {
