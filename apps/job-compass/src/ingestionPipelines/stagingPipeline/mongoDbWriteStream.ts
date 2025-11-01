@@ -1,90 +1,57 @@
 import { Writable, type WritableOptions} from "stream";
-import { Collection, type Document} from "mongodb";
-import type { StagedJobRecordsSchema } from "../../schemas/stagedJobSchema/stagedJobRecordsSchema.js";
-import { getLocalStagedJobRecordsCollection} from "../../mongoConnectionDb.js";
+import { Collection, type Document } from "mongodb";
 
-// 1. Define the options for our factory
-export interface MongoBatchStreamOptions<T extends Document> extends WritableOptions {
-  collection: Collection<T>; // The MongoDB collection to write to
-  batchSize?: number; // How many docs to write at once
-  keyField: string; // The field to use for the upsert (e.g., 'sourceId')
+export interface MongoBatchWritableOptions<T extends Document> extends WritableOptions {
+  collection: Collection<T>;
+  batchSize?: number;
+  keyField: keyof T;
 }
 
-/**
- * A type-safe factory function that creates a Writable stream
- * to batch-write documents to a MongoDB collection.
- */
-export function createMongoBatchStream<T extends Document>(
-  options: MongoBatchStreamOptions<T>
-): Writable {
-  const { collection, batchSize = 1000, keyField, ...writableOptions } = options;
 
-  // This will be our internal buffer
-  let batch: T[] = [];
+export class MongoBatchWritable<T extends Document> extends Writable {
+  private batch: T[] = [];
+  private batchSize: number;
+  private keyField: keyof T;
+  private collection: Collection<T>;
 
-  // This async function does the actual database work
-  const flushBatch = async (): Promise<void> => {
-    if (batch.length === 0) {
-      return; // Nothing to do
-    }
+  constructor(options: MongoBatchWritableOptions<T>) {
+    super({ ...options, objectMode: true });
+    this.collection = options.collection;
+    this.batchSize = options.batchSize ?? 1000;
+    this.keyField = options.keyField;
+  }
 
-    // Get the batch and clear the internal one immediately
-    const batchToFlush = batch;
-    batch = [];
+  // Internal helper to flush batch
+  private async flushBatch(): Promise<void> {
+    if (this.batch.length === 0) return;
 
-    // 1. Create the array of 'upsert' operations
-    const operations = batchToFlush.map((doc) => ({
+    const operations = this.batch.map((doc) => ({
       updateOne: {
-        filter: { [keyField]: doc[keyField] } as any, // Use the key field
+        filter: { [this.keyField]: doc[this.keyField] } as any,
         update: { $set: doc },
         upsert: true,
       },
     }));
 
-    // 2. Run the bulkWrite operation
-    // We use { ordered: false } for max speed. It won't stop on one error.
-    await collection.bulkWrite(operations, { ordered: false });
-  };
+    this.batch = [];
+    await this.collection.bulkWrite(operations, { ordered: false });
+  }
 
-  // 3. Create and return the Writable stream
-  return new Writable({
-    ...writableOptions,
-    objectMode: true, // We are accepting objects
+  _write(chunk: T, _encoding: string, callback: (err?: Error) => void) {
+    this.batch.push(chunk);
 
-    /**
-     * This method is called for every object coming from the Zod stream.
-     */
-    async write(
-      chunk: T,
-      encoding: BufferEncoding,
-      callback: (error?: Error | null) => void
-    ) {
-      batch.push(chunk as T);
-
-      if (batch.length >= batchSize) {
-        try {
-          await flushBatch(); // Write to DB
-          callback(); // Signal we are ready for the next chunk
-        } catch (err) {
-          callback(err as Error); // Signal an error
-        }
-      } else {
-        // Batch not full yet, just ask for the next chunk
-        callback();
-      }
-    },
-
-    /**
-     * This method is called right at the end, after all chunks are written.
-     * It ensures the last remaining items in the batch are flushed.
-     */
-    async final(callback: (error?: Error | null) => void) {
-      try {
-        await flushBatch(); // Write the final, partial batch
-        callback(); // Signal success
-      } catch (err) {
-        callback(err as Error); // Signal an error
-      }
-    },
-  });
+    if (this.batch.length >= this.batchSize) {
+      this.flushBatch()
+        .then(() => callback())
+        .catch((err) => callback(err));
+    } else {
+      callback();
+    }
+  }
+  _final(callback: (err?: Error) => void) {
+    this.flushBatch()
+      .then(() => callback())
+      .catch((err) => callback(err));
+  }
 }
+
