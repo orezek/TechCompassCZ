@@ -1,6 +1,6 @@
 import { Db, MongoClient } from "mongodb";
-import type {StagedJobRecordsSchema} from "./schemas/stagedJobSchema/stagedJobRecordsSchema.js";
-import type {EnrichedJobRecordsSchema} from "./schemas/enrichedJobSchema/enrichedJobSchema.js";
+import type { StagedJobRecordsSchema } from "./schemas/stagedJobSchema/stagedJobRecordsSchema.js";
+import type { EnrichedJobRecordsSchema } from "./schemas/enrichedJobSchema/enrichedJobSchema.js";
 
 export const CLOUD_URI =
   "mongodb+srv://jobcompass:jobcompass%2A@jobcompas.2wbteqm.mongodb.net/?appName=JobCompas";
@@ -87,7 +87,10 @@ export const closeCloudMongoInstance = async () => {
 export async function getLocalStagedJobRecordsCollection() {
   try {
     const itJobsDb = await connectToLocalItJobsDB();
-    if (itJobsDb) return itJobsDb.collection<StagedJobRecordsSchema>(LOCAL_STAGED_COLLECTION_NAME);
+    if (itJobsDb)
+      return itJobsDb.collection<StagedJobRecordsSchema>(
+        LOCAL_STAGED_COLLECTION_NAME,
+      );
   } catch (e) {
     console.error(
       "Failed to connect to local staged-jobs-records collection",
@@ -100,7 +103,10 @@ export async function getLocalStagedJobRecordsCollection() {
 export async function getLocalEnrichedJobRecordsCollection() {
   try {
     const itJobsDb = await connectToLocalItJobsDB();
-    if (itJobsDb) return itJobsDb.collection<EnrichedJobRecordsSchema>(LOCAL_ENRICHED_COLLECTION_NAME);
+    if (itJobsDb)
+      return itJobsDb.collection<EnrichedJobRecordsSchema>(
+        LOCAL_ENRICHED_COLLECTION_NAME,
+      );
   } catch (e) {
     console.error(
       "Failed to connect to local enriched-jobs-records collection",

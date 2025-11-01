@@ -1,5 +1,8 @@
 import * as dotenv from "dotenv";
-import {closeLocalMongoInstance, getLocalEnrichedJobRecordsCollection} from "../mongoConnectionDb.js";
+import {
+  closeLocalMongoInstance,
+  getLocalEnrichedJobRecordsCollection, getLocalStagedJobRecordsCollection,
+} from "../mongoConnectionDb.js";
 import { type EnrichedJobRecordsSchema } from "../schemas/enrichedJobSchema/enrichedJobSchema.js";
 import { extractTechnicalSkillsAndMethodologies } from "../chains/dataEnrichment/technicalSkillsAndMethodologiesExtraction.js";
 import { extractCorePositionAndDetails } from "../chains/dataEnrichment/corePositionDetailsExtraction.js";
@@ -16,17 +19,15 @@ import { extractWorkloadAndEnvironmentContext } from "../chains/dataEnrichment/w
 
 dotenv.config();
 
-
-
 const enrichedJobsCollection = await getLocalEnrichedJobRecordsCollection();
-
+const stagedJobsCollection = await getLocalStagedJobRecordsCollection();
 const BATCH_SIZE = 100;
 let bulkWriteOperations: AnyBulkWriteOperation<EnrichedJobRecordsSchema>[] = [];
 let apiCounter = 0;
 async function enrichJobRecords() {
-  if (enrichedJobsCollection)
-  {
+  if (enrichedJobsCollection && stagedJobsCollection) {
     const enrichedJobs = enrichedJobsCollection.find({});
+    // const stagedJobs = stagedJobsCollection.find({});
     for await (const enrichedJob of enrichedJobs) {
       console.log(`Working on: ${enrichedJob.originalAdData?.jobTitle}`);
       const [
@@ -42,7 +43,9 @@ async function enrichJobRecords() {
         extractedQualificationAndExperience,
         extractedWorkloadAndEnvironmentContext,
       ] = await Promise.all([
-        extractCorePositionAndDetails(JSON.stringify(enrichedJob.originalAdData)),
+        extractCorePositionAndDetails(
+          JSON.stringify(enrichedJob.originalAdData),
+        ),
         extractTechnicalSkillsAndMethodologies(
           JSON.stringify(enrichedJob.originalAdData),
         ),
@@ -50,7 +53,9 @@ async function enrichJobRecords() {
         extractCareerDevelopmentAndRecruitment(
           JSON.stringify(enrichedJob.originalAdData),
         ),
-        extractCompanyAndTeamContext(JSON.stringify(enrichedJob.originalAdData)),
+        extractCompanyAndTeamContext(
+          JSON.stringify(enrichedJob.originalAdData),
+        ),
         extractCompensationAndFinancials(
           JSON.stringify(enrichedJob.originalAdData),
         ),
@@ -86,7 +91,8 @@ async function enrichJobRecords() {
                 extractedCompanyAndTeamContext,
               "analyticalInsights.compensationAndFinancials":
                 extractedCompensationAndFinancials,
-              "analyticalInsights.contractulDetails": extractedContractualDetails,
+              "analyticalInsights.contractulDetails":
+                extractedContractualDetails,
               "analyticalInsights.culturalAndPsychologicalIndicators":
                 extractedCulturalAndPsychologicalIndicators,
               "analyticalInsights.locationAndWorkModel":
@@ -124,4 +130,3 @@ try {
 } finally {
   await closeLocalMongoInstance();
 }
-

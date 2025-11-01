@@ -1,28 +1,34 @@
-import {geminiFlashLite} from "../models/google/geminiModels.js";
-import {googleEmbeddingModel} from "../models/google/embeddingModels.js";
-import { MongoDBAtlasVectorSearch} from "@langchain/mongodb";
-import {closeCloudMongoInstance, getCloudChunkDocumentCollection} from "../mongoConnectionDb.js";
+import { geminiFlashLite } from "../models/google/geminiModels.js";
+import { googleEmbeddingModel } from "../models/google/embeddingModels.js";
+import { MongoDBAtlasVectorSearch } from "@langchain/mongodb";
+import {
+  closeCloudMongoInstance,
+  getCloudChunkDocumentCollection,
+} from "../mongoConnectionDb.js";
 import type { Document } from "@langchain/core/documents";
 
 // new
-import { createAgent, tool} from "langchain";
+import { createAgent, tool } from "langchain";
 import * as z from "zod";
 
 const ragChunkCollection = await getCloudChunkDocumentCollection();
-if (!ragChunkCollection) throw new Error("Check your Mongo Database connection!");
-
+if (!ragChunkCollection)
+  throw new Error("Check your Mongo Database connection!");
 
 const retriever = new MongoDBAtlasVectorSearch(googleEmbeddingModel, {
   collection: ragChunkCollection,
   indexName: "vector_index",
   textKey: "text",
   embeddingKey: "embedding",
-})
+});
 
-const retrieveDocs = tool (
+const retrieveDocs = tool(
   async (input) => {
     console.log(input);
-    const results: Document[] = await retriever.similaritySearch(input.query, 5);
+    const results: Document[] = await retriever.similaritySearch(
+      input.query,
+      5,
+    );
     return results.map((d) => d.pageContent).join("\n\n");
   },
   {
@@ -31,9 +37,8 @@ const retrieveDocs = tool (
     schema: z.object({
       query: z.string().describe("User's information need or question."),
     }),
-  }
-)
-
+  },
+);
 
 const agent = createAgent({
   model: geminiFlashLite,
@@ -42,7 +47,7 @@ const agent = createAgent({
     When asked something, use the 'retrieve_docs' tool to fetch relevant context.
     Always base your answer on the retrieved context.
     Be concise and accurate. If information is missing, say so. If the tools did not find the information, report it to the user. Always output to the user the query you asked the tool.`,
-})
+});
 
 const response = await agent.invoke({
   messages: [

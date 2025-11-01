@@ -6,5 +6,3 @@ dotenv.config();
 export const googleEmbeddingModel = new GoogleGenerativeAIEmbeddings({
   model: "embedding-001",
 });
-
-

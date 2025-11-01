@@ -1,12 +1,12 @@
-import { Writable, type WritableOptions} from "stream";
+import { Writable, type WritableOptions } from "stream";
 import { Collection, type Document } from "mongodb";
 
-export interface MongoBatchWritableOptions<T extends Document> extends WritableOptions {
+export interface MongoBatchWritableOptions<T extends Document>
+  extends WritableOptions {
   collection: Collection<T>;
   batchSize?: number;
   keyField: keyof T;
 }
-
 
 export class MongoBatchWritable<T extends Document> extends Writable {
   private batch: T[] = [];
@@ -24,7 +24,7 @@ export class MongoBatchWritable<T extends Document> extends Writable {
   // Internal helper to flush batch
   private async flushBatch(): Promise<void> {
     if (this.batch.length === 0) return;
-
+    console.log("Number of records to save: ", this.batch.length);
     const operations = this.batch.map((doc) => ({
       updateOne: {
         filter: { [this.keyField]: doc[this.keyField] } as any,
@@ -54,4 +54,3 @@ export class MongoBatchWritable<T extends Document> extends Writable {
       .catch((err) => callback(err));
   }
 }
-

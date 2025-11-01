@@ -1,6 +1,9 @@
 import { geminiFlashLite } from "../models/google/geminiModels.js";
 import * as hub from "langchain/hub/node";
-import {closeLocalMongoInstance, getLocalEnrichedJobRecordsCollection} from "../mongoConnectionDb.js";
+import {
+  closeLocalMongoInstance,
+  getLocalEnrichedJobRecordsCollection,
+} from "../mongoConnectionDb.js";
 import type { EnrichedJobRecordsSchema } from "../schemas/enrichedJobSchema/enrichedJobSchema.js";
 import type { AnyBulkWriteOperation } from "mongodb";
 import { searchVectorStringBuilder } from "../utils/searchVectorStringBuilder.js";
@@ -9,7 +12,8 @@ const jobAdsCollection: EnrichedJobRecordsSchema[] = [];
 const jobDescriptionPrompt = await hub.pull("job-descripton-extractor");
 const chain = jobDescriptionPrompt.pipe(geminiFlashLite);
 
-const enrichedJobsRecordsCollection = await getLocalEnrichedJobRecordsCollection();
+const enrichedJobsRecordsCollection =
+  await getLocalEnrichedJobRecordsCollection();
 if (!enrichedJobsRecordsCollection) {
   throw new Error("Failed to connect to enriched-job-records collection.");
 } else {
@@ -60,7 +64,6 @@ if (!enrichedJobsRecordsCollection) {
   await enrichedJobsRecordsCollection.bulkWrite(operations);
   console.log("Writing has finished.");
 
-
   // Create a search vector string a composite of other fields.
   const jobAdsNew = enrichedJobsRecordsCollection.find({});
 
@@ -68,14 +71,15 @@ if (!enrichedJobsRecordsCollection) {
     .map((jobAd) => {
       const vectorString = searchVectorStringBuilder(jobAd);
       console.log(`JobId: ${jobAd._id} : ${vectorString}`);
-      const vectorStringRecord: AnyBulkWriteOperation<EnrichedJobRecordsSchema> = {
-        updateOne: {
-          filter: { _id: jobAd._id },
-          update: {
-            $set: { "searchMetadata.searchVectorString": vectorString },
+      const vectorStringRecord: AnyBulkWriteOperation<EnrichedJobRecordsSchema> =
+        {
+          updateOne: {
+            filter: { _id: jobAd._id },
+            update: {
+              $set: { "searchMetadata.searchVectorString": vectorString },
+            },
           },
-        },
-      };
+        };
       return vectorStringRecord;
     })
     .toArray();

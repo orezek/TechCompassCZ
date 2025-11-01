@@ -1,4 +1,3 @@
-
 import * as dotenv from "dotenv";
 import * as csv from "fast-csv";
 import path from "path";
@@ -7,7 +6,7 @@ import type { AnyBulkWriteOperation } from "mongodb";
 import {
   getLocalStagedJobRecordsCollection,
   getLocalEnrichedJobRecordsCollection,
-  closeLocalMongoInstance
+  closeLocalMongoInstance,
 } from "../mongoConnectionDb.js";
 
 dotenv.config();
@@ -19,7 +18,6 @@ import { originalAdSchema } from "../schemas/enrichedJobSchema/originalJobAdSche
 import { stagedJobRecordsSchema } from "../schemas/stagedJobSchema/stagedJobRecordsSchema.js";
 
 const stagedJobsCollection = await getLocalStagedJobRecordsCollection();
-
 
 async function jobAdExtractor() {
   let counter = 0;
@@ -45,9 +43,10 @@ async function jobAdExtractor() {
         const checkPromise = (async () => {
           try {
             counter++;
-            const document: StagedJobRecordsSchema | null = await stagedJobsCollection!.findOne({
-              sourceId: validJson.sourceId,
-            });
+            const document: StagedJobRecordsSchema | null =
+              await stagedJobsCollection!.findOne({
+                sourceId: validJson.sourceId,
+              });
             if (!document) {
               results.push(validJson);
               console.log(`Inserted ad: ${counter} valid json: `, validJson);
@@ -70,7 +69,6 @@ async function jobAdExtractor() {
       });
   });
 }
-
 
 async function enrichedJobsAdder() {
   const operations: AnyBulkWriteOperation<EnrichedJobRecordsSchema>[] = [];
@@ -108,7 +106,6 @@ async function enrichedJobsAdder() {
   console.log("The DB has been closed");
 }
 
-
 try {
   await jobAdExtractor();
   console.log("The extraction ended!");
@@ -121,6 +118,4 @@ try {
   await closeLocalMongoInstance();
 }
 
-
 // new gen ingestion pipeline
-
