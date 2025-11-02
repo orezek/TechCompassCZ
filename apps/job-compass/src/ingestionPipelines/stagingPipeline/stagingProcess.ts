@@ -1,7 +1,11 @@
 import { createReadStream } from "fs";
 import { parse } from "fast-csv";
 import { stagedJobRecordsSchema } from "../../schemas/stagedJobSchema/stagedJobRecordsSchema.js";
-import {closeLocalMongoInstance, getLocalStagedJobRecordsCollection } from "../../mongoConnectionDb.js";
+import {
+  closeLocalMongoInstance,
+  getCloudStageJobRecordsCollection,
+  getLocalStagedJobRecordsCollection
+} from "../../mongoConnectionDb.js";
 import { createZodValidatorStream } from "./zodTransformStream.js";
 import { pipeline } from "node:stream/promises";
 import type { Collection } from "mongodb";
@@ -46,11 +50,13 @@ async function runIngestionPipeline<T extends Document>( mongoDbCollection: Coll
 }
 
 const stagedCollection = await getLocalStagedJobRecordsCollection();
-if (!stagedCollection) {
+const stagedCloudCollection = await getCloudStageJobRecordsCollection();
+if (!stagedCollection || !stagedCloudCollection) {
   throw new Error("Database connection failed, cannot start pipeline.");
 }
 await runIngestionPipeline(
-  stagedCollection,
+  // stagedCollection,
+  stagedCloudCollection,
   CSV_FILE_PATH,
   stagedJobRecordsSchema,
 );

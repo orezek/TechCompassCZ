@@ -119,7 +119,7 @@ export async function getLocalEnrichedJobRecordsCollection() {
 export async function getCloudStageJobRecordsCollection() {
   try {
     const itJobsDb = await connectToCloudItJobsDb();
-    if (itJobsDb) return itJobsDb.collection(CLOUD_STAGED_COLLECTION_NAME);
+    if (itJobsDb) return itJobsDb.collection<StagedJobRecordsSchema>(CLOUD_STAGED_COLLECTION_NAME);
   } catch (e) {
     console.error(
       "Failed to connect to cloud staged-jobs-records collection",
@@ -132,7 +132,7 @@ export async function getCloudStageJobRecordsCollection() {
 export async function getCloudEnrichedJobRecordsCollection() {
   try {
     const itJobsDb = await connectToCloudItJobsDb();
-    if (itJobsDb) return itJobsDb.collection(CLOUD_ENRICHED_COLLECTION_NAME);
+    if (itJobsDb) return itJobsDb.collection<EnrichedJobRecordsSchema>(CLOUD_ENRICHED_COLLECTION_NAME);
   } catch (e) {
     console.error(
       "Failed to connect to cloud enriched-jobs-records collection",

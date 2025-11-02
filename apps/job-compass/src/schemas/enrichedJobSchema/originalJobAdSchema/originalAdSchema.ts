@@ -1,10 +1,5 @@
 import { z } from "zod";
-
 export const originalAdSchema = z.object({
-  _id: z
-    .string()
-    .nonempty()
-    .describe("ID from MongoDB _id field for lookups and reference"),
   jobTitle: z
     .string()
     .nonempty()
@@ -46,7 +41,7 @@ export const originalAdSchema = z.object({
     .describe("Raw job description as ingested from the ad."),
   benefits: z
     .string()
-    .nonempty()
+    .nullable()
     .describe("Raw benefits string as ingested from the ad."),
   companyIntro: z
     .string()
@@ -59,3 +54,5 @@ export const originalAdSchema = z.object({
     .nullable()
     .describe("Raw job details as ingested from the ad."),
 });
+
+export type OriginalAdSchema = z.infer<typeof originalAdSchema>;

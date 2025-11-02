@@ -1,7 +1,8 @@
 import { z } from "zod";
-
+import { ObjectId } from "mongodb";
 
 export const stagedJobRecordsSchema = z.object({
+  _id: z.instanceof(ObjectId).optional().describe("Unique MongoDB ID assigned by Mongo."),
   jobTitle: z.string().min(1, { message: "JobTitle cannot be empty" }).describe("Ad job title as taken from the ad."),
   companyName: z.string().min(1, { message: "Company cannot be empty" }).describe("The name of the company tha is searching for an employee/freelancer."),
   adUrl: z.preprocess((val) => {
