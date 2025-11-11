@@ -7,14 +7,12 @@ import {
 } from "../../mongoConnectionDb.js";
 import type { EnrichedJobRecordsSchema } from "../../schemas/enrichedJobSchema/enrichedJobSchema.js";
 import type { AnyBulkWriteOperation } from "mongodb";
-import { searchVectorStringBuilder } from "../../utils/searchVectorStringBuilder.js";
 
 const jobAdsCollection: EnrichedJobRecordsSchema[] = [];
 const jobDescriptionPrompt = await hub.pull("job-descripton-extractor");
 const chain = jobDescriptionPrompt.pipe(geminiFlashLite);
 
-const enrichedJobsRecordsCollection =
-  await getLocalEnrichedJobRecordsCollection();
+const enrichedJobsRecordsCollection = await getLocalEnrichedJobRecordsCollection();
 const enrichedCloudJobRecordsCollection = await getCloudEnrichedJobRecordsCollection();
 
 if (!enrichedJobsRecordsCollection || !enrichedCloudJobRecordsCollection) {
@@ -73,31 +71,6 @@ if (!enrichedJobsRecordsCollection || !enrichedCloudJobRecordsCollection) {
   }
   await enrichedCloudJobRecordsCollection.bulkWrite(operations);
   console.log("Writing has finished.");
-
-  // // Create a search vector string a composite of other fields.
-  // const jobAdsNew = enrichedCloudJobRecordsCollection.find({"searchMedata.jobDescriptionCleaned": {"$exists": true}})
-  //
-  // const writableJobAds = await jobAdsNew
-  //   .map((jobAd) => {
-  //     const vectorString = searchVectorStringBuilder(jobAd);
-  //     console.log(`JobId: ${jobAd._id} : ${vectorString}`);
-  //     const vectorStringRecord: AnyBulkWriteOperation<EnrichedJobRecordsSchema> =
-  //       {
-  //         updateOne: {
-  //           filter: { _id: jobAd._id },
-  //           update: {
-  //             $set: { "searchMetadata.searchVectorString": vectorString },
-  //           },
-  //         },
-  //       };
-  //     return vectorStringRecord;
-  //   })
-  //   .toArray();
-  //
-  // if (writableJobAds.length > 0) {
-  //   await enrichedCloudJobRecordsCollection.bulkWrite(writableJobAds);
-  //   console.log("Writing to DB finished.");
-  // }
 }
 await closeLocalMongoInstance();
 await closeCloudMongoInstance();
