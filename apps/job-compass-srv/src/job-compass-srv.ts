@@ -470,7 +470,7 @@ fastify.get("/threads/:thread_id/state", async (req, reply) => {
 // Start server
 const start = async () => {
   try {
-    await fastify.listen({ port: 3333, host: "0.0.0.0" });
+    await fastify.listen({ port: 3336, host: "0.0.0.0" });
     console.log("🚀 LangGraph-compliant server running on http://localhost:3333");
   } catch (err: unknown) {
     fastify.log.error(err);
