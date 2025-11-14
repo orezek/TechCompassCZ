@@ -4,10 +4,14 @@ import { originalAdSchema } from "./originalJobAdSchema/originalAdSchema.js";
 import { analyticalInsightsSchema } from "./analyticalInsightsSchema/analyticalInsightsSchema.js";
 import { pipelineMetadataSchema } from "./observabilitySchema/observabilitySchema.js";
 import { searchDataSchema } from "./searchDataSchema/searchDataSchema.js";
-import {ObjectId } from 'mongodb'
+import { ObjectId } from "mongodb";
 export const enrichedJobRecordsSchema = z.object({
   _id: z.instanceof(ObjectId).optional().describe("Unique document ID."),
-  parentId: z.instanceof(ObjectId).describe("ID from StagedJob Collection _id field for lookups and reference"),
+  parentId: z
+    .instanceof(ObjectId)
+    .describe(
+      "ID from StagedJob Collection _id field for lookups and reference",
+    ),
   originalAdData: originalAdSchema
     .nullable()
     .default(null)
